@@ -343,6 +343,7 @@ optional_policy(`
 # wpa_cli local policy
 #
 
+domain_auto_trans(NetworkManager_t, wpa_cli_exec_t, wpa_cli_t)
 allow wpa_cli_t self:capability dac_override;
 allow wpa_cli_t self:unix_dgram_socket create_socket_perms;
 
