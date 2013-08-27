@@ -1,0 +1,41 @@
+policy_module(pythonsupport,0.0.1)
+
+########################################
+#
+# Declarations
+#
+
+type pythoncompile_t;
+type pythoncompile_exec_t;
+domain_type(pythoncompile_t)
+domain_entry_file(pythoncompile_t, pythoncompile_exec_t)
+
+type python_compiled_t;
+files_type(python_compiled_t)
+
+########################################
+#
+# python-support local policy
+#
+
+kernel_read_system_state(pythoncompile_t)
+kernel_read_kernel_sysctls(pythoncompile_t)
+
+corecmd_exec_bin(pythoncompile_t)
+
+
+files_read_etc_files(pythoncompile_t)
+files_read_usr_files(pythoncompile_t)
+
+libs_use_ld_so(pythoncompile_t)
+libs_use_shared_libs(pythoncompile_t)
+
+
+miscfiles_read_localization(pythoncompile_t)
+
+
+# create compiled python modules
+allow pythoncompile_t python_compiled_t:dir manage_dir_perms;
+allow pythoncompile_t python_compiled_t:file manage_file_perms;
+allow pythoncompile_t python_compiled_t:lnk_file manage_lnk_file_perms;
+files_var_lib_filetrans(pythoncompile_t, python_compiled_t, dir)

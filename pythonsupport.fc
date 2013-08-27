@@ -1,0 +1,2 @@
+/usr/sbin/update-python-modules	--	gen_context(system_u:object_r:pythoncompile_exec_t,s0)
+/var/lib/python-support(/.*)?		gen_context(system_u:object_r:python_compiled_t,s0)

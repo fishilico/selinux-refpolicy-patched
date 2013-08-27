@@ -1,0 +1,83 @@
+## <summary>Support for precompiling python modules</summary>
+## <desc>
+##	<p>
+##		Debians python-support will precompile installed python
+##		packages for installed python versions. This way,
+##		the python2.3-foobar and python2.4-foobar (and 2.5) packages
+##		could be merged into one python-foobar while keeping the
+##		dependency information useful.
+##	</p>
+## </desc>
+#
+
+########################################
+## <summary>
+##	Execute the python-support utility to precompile modules.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`pythonsupport_domtrans',`
+	gen_require(`
+		type pythoncompile_t, pythoncompile_exec_t;
+	')
+
+	domain_auto_trans($1,pythoncompile_exec_t,pythoncompile_t)
+
+	allow $1 pythoncompile_t:fd use;
+	allow pythoncompile_t $1:fd use;
+	allow $1 pythoncompile_t:fifo_file rw_file_perms;
+	allow $1 pythoncompile_t:process sigchld;
+')
+
+########################################
+## <summary>
+##      Role access for python.
+## </summary>
+## <param name="role">
+##      <summary>
+##      Role allowed access.
+##      </summary>
+## </param>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+## <rolecap/>
+#
+interface(`python_role',`
+        gen_require(`
+                type pythoncompile_t, pythoncompile_exec_t;
+        ')
+
+        domtrans_pattern($2, pythoncompile_exec_t, pythoncompile_t)
+        role $1 types pythoncompile_t;
+
+        allow $2 pythoncompile_t:process { signal_perms };
+        ps_process_pattern($2, pythoncompile_t)
+')
+
+########################################
+## <summary>
+##	Read compiled python modules
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to read the compiled python modules.
+##	</summary>
+## </param>
+#
+interface(`pythonsupport_compiled_read',`
+	gen_require(`
+		type python_compiled_t;
+	')
+
+	files_search_var_lib($1)
+	allow $1 python_compiled_t:dir list_dir_perms;
+	allow $1 python_compiled_t:file read_file_perms;
+	allow $1 python_compiled_t:lnk_file read_lnk_file_perms;
+')
