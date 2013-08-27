@@ -22,7 +22,20 @@ type mozilla_exec_t;
 typealias mozilla_t alias { user_mozilla_t staff_mozilla_t sysadm_mozilla_t };
 typealias mozilla_t alias { auditadm_mozilla_t secadm_mozilla_t };
 userdom_user_application_domain(mozilla_t, mozilla_exec_t)
-role mozilla_roles types mozilla_t;
+role mozilla_roles types { mozilla_t chrome_sandbox_t };
+
+type chrome_sandbox_t;
+type chrome_browser_exec_t;
+userdom_user_application_domain(mozilla_t, chrome_browser_exec_t)
+domain_auto_trans(chrome_sandbox_t, chrome_browser_exec_t, mozilla_t)
+
+type chrome_sandbox_exec_t;
+userdom_user_application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
+ubac_constrained(chrome_sandbox_t)
+
+type chrome_sandbox_tmp_t;
+files_tmp_file(chrome_sandbox_tmp_t)
+ubac_constrained(chrome_sandbox_tmp_t)
 
 type mozilla_home_t;
 typealias mozilla_home_t alias { user_mozilla_home_t staff_mozilla_home_t sysadm_mozilla_home_t };
@@ -110,6 +123,51 @@ allow mozilla_t mozilla_plugin_rw_t:lnk_file read_lnk_file_perms;
 stream_connect_pattern(mozilla_t, mozilla_plugin_tmpfs_t, mozilla_plugin_tmpfs_t, mozilla_plugin_t)
 
 can_exec(mozilla_t, { mozilla_exec_t mozilla_plugin_rw_t mozilla_plugin_home_t })
+
+# For Chromium
+allow mozilla_t chrome_sandbox_t:process sigchld;
+fs_getattr_xattr_fs(chrome_sandbox_t)
+fs_getattr_xattr_fs(mozilla_t)
+
+allow chrome_sandbox_t mozilla_t:dir list_dir_perms;
+allow chrome_sandbox_t mozilla_t:fifo_file rw_file_perms;
+allow chrome_sandbox_t mozilla_t:file read_file_perms;
+allow chrome_sandbox_t mozilla_t:lnk_file read_lnk_file_perms;
+allow chrome_sandbox_t mozilla_t:unix_dgram_socket { read write };
+allow chrome_sandbox_t mozilla_t:unix_stream_socket { read write };
+allow chrome_sandbox_t mozilla_t:fd use;
+allow chrome_sandbox_t mozilla_t:file write;
+allow chrome_sandbox_t proc_t:dir read;
+allow chrome_sandbox_t self:process setrlimit;
+
+files_tmp_filetrans(chrome_sandbox_t, chrome_sandbox_tmp_t, { file dir })
+allow chrome_sandbox_t chrome_sandbox_tmp_t:dir manage_dir_perms;
+allow mozilla_t self:unix_dgram_socket sendto;
+allow mozilla_t chrome_browser_exec_t:file execute_no_trans;
+# for V8
+allow mozilla_t self:process execmem;
+
+allow mozilla_t chrome_sandbox_t:shm { write unix_read getattr unix_write associate read };
+allow mozilla_t chrome_sandbox_t:unix_dgram_socket { read write };
+
+ifdef(`distro_debian', `
+# bug in chromium
+allow mozilla_t chrome_browser_exec_t:file execmod;
+')
+
+dontaudit chrome_sandbox_t domain:dir getattr;
+application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
+domain_auto_trans(mozilla_t, chrome_sandbox_exec_t, chrome_sandbox_t)
+allow mozilla_t mozilla_home_t:sock_file manage_sock_file_perms;
+allow chrome_sandbox_t self:fifo_file rw_file_perms;
+allow chrome_sandbox_t mozilla_t:unix_dgram_socket { read write };
+allow chrome_sandbox_t mozilla_t:unix_stream_socket { read write };
+allow chrome_sandbox_t self:capability { chown dac_override fsetid setgid setuid net_raw net_raw sys_chroot sys_ptrace sys_admin };
+allow chrome_sandbox_t mozilla_t:process { share sigchld };
+allow mozilla_t chrome_sandbox_t:fd use;
+allow mozilla_t chrome_sandbox_t:unix_stream_socket { read write };
+dev_read_sysfs(mozilla_t)
+domain_dontaudit_search_all_domains_state(chrome_sandbox_t)
 
 kernel_read_kernel_sysctls(mozilla_t)
 kernel_read_network_state(mozilla_t)
@@ -199,6 +257,7 @@ mozilla_run_plugin(mozilla_t, mozilla_roles)
 mozilla_run_plugin_config(mozilla_t, mozilla_roles)
 
 xserver_user_x_domain_template(mozilla, mozilla_t, mozilla_tmpfs_t)
+corenet_tcp_connect_xserver_port(mozilla_t)
 xserver_dontaudit_read_xdm_tmp_files(mozilla_t)
 xserver_dontaudit_getattr_xdm_tmp_sockets(mozilla_t)
 
