@@ -79,6 +79,7 @@ files_pid_filetrans(policykit_t, policykit_var_run_t, { file dir })
 
 can_exec(policykit_t, policykit_exec_t)
 
+policykit_domtrans_auth(policykit_t)
 domtrans_pattern(policykit_t, policykit_auth_exec_t, policykit_auth_t)
 domtrans_pattern(policykit_t, policykit_resolve_exec_t, policykit_resolve_t)
 
@@ -99,8 +100,11 @@ userdom_read_all_users_state(policykit_t)
 optional_policy(`
 	dbus_system_domain(policykit_t, policykit_exec_t)
 
+	init_dbus_chat(policykit_t)
+
 	optional_policy(`
 		consolekit_dbus_chat(policykit_t)
+		consolekit_read_pid_files(policykit_t)
 	')
 
 	optional_policy(`

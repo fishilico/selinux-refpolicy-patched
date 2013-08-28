@@ -89,6 +89,13 @@ template(`dbus_role_template',`
 	corecmd_shell_domtrans($1_dbusd_t, $1_t)
 
 	auth_use_nsswitch($1_dbusd_t)
+	init_search_pid_dirs($1_dbusd_t)
+	optional_policy(`
+		consolekit_read_pid_files($1_dbusd_t)
+	')
+	optional_policy(`
+		systemd_login_list_pid_dirs($1_dbusd_t)
+	')
 
 	ifdef(`hide_broken_symptoms',`
 		dontaudit $3 $1_dbusd_t:netlink_selinux_socket { read write };

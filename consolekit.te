@@ -32,6 +32,8 @@ allow consolekit_t self:process { getsched signal };
 allow consolekit_t self:fifo_file rw_fifo_file_perms;
 allow consolekit_t self:unix_stream_socket { accept listen };
 
+fs_getattr_xattr_fs(consolekit_t)
+
 create_files_pattern(consolekit_t, consolekit_log_t, consolekit_log_t)
 append_files_pattern(consolekit_t, consolekit_log_t, consolekit_log_t)
 read_files_pattern(consolekit_t, consolekit_log_t, consolekit_log_t)
