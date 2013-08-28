@@ -185,6 +185,24 @@ interface(`postfix_config_filetrans',`
 
 ########################################
 ## <summary>
+##	Access postfix master fifos
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`postfix_rw_master_fifo',`
+	gen_require(`
+		type postfix_master_t;
+	')
+	allow $1 postfix_master_t:fifo_file rw_file_perms;
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to read and
 ##	write postfix local delivery
 ##	TCP sockets.
@@ -318,6 +336,31 @@ interface(`postfix_dontaudit_use_fds',`
 	')
 
 	dontaudit $1 postfix_master_t:fd use;
+')
+
+########################################
+## <summary>
+##	Allows a user role to contain domains for Postfix utilities
+##	that are ran by users.
+## </summary>
+## <param name="role">
+##	<summary>
+##	User role that can run Postfix commands
+##	</summary>
+## </param>
+## <param name="domain">
+##	<summary>
+##	User domain that can run Postfix commands
+##	</summary>
+## </param>
+#
+interface(`postfix_user_role',`
+	gen_require(`
+		type postfix_postqueue_t;
+	')
+
+	role $1 types postfix_postqueue_t;
+	allow postfix_postqueue_t $2:process sigchld;
 ')
 
 ########################################

@@ -92,7 +92,7 @@ miscfiles_read_localization(dovecot_domain)
 # Local policy
 #
 
-allow dovecot_t self:capability { dac_override dac_read_search chown fsetid kill setgid setuid sys_chroot };
+allow dovecot_t self:capability { dac_override dac_read_search chown fsetid kill setgid setuid sys_chroot sys_resource };
 dontaudit dovecot_t self:capability sys_tty_config;
 allow dovecot_t self:process { setrlimit signal_perms getcap setcap setsched };
 allow dovecot_t self:tcp_socket { accept listen };
@@ -153,6 +153,8 @@ corenet_tcp_connect_postgresql_port(dovecot_t)
 
 domain_use_interactive_fds(dovecot_t)
 
+files_list_usr(dovecot_t)
+files_read_usr_files(dovecot_t)
 files_read_var_lib_files(dovecot_t)
 files_read_var_symlinks(dovecot_t)
 files_search_spool(dovecot_t)
@@ -198,6 +200,10 @@ optional_policy(`
 	mta_manage_mail_home_rw_content(dovecot_t)
 	mta_home_filetrans_mail_home_rw(dovecot_t, dir, "Maildir")
 	mta_home_filetrans_mail_home_rw(dovecot_t, dir, ".maildir")
+')
+
+optional_policy(`
+	mysql_read_config(dovecot_t)
 ')
 
 optional_policy(`
