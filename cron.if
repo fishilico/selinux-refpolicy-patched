@@ -190,7 +190,11 @@ interface(`cron_unconfined_role',`
 		dontaudit $2 crond_t:fifo_file rw_fifo_file_perms;
 
 		dontaudit $2 unconfined_cronjob_t:process { ptrace signal_perms };
-')
+	')
+
+	tunable_policy(`deny_ptrace',`',`
+		allow $2 unconfined_cronjob_t:process ptrace;
+	')
 
 	optional_policy(`
 		gen_require(`
@@ -321,6 +325,9 @@ interface(`cron_system_entry',`
 	domtrans_pattern(crond_t, $2, $1)
 
 	role system_r types $1;
+
+	allow $1 crond_t:fifo_file rw_fifo_file_perms;
+	allow $1 system_cronjob_t:fifo_file rw_fifo_file_perms;
 ')
 
 ########################################
@@ -381,6 +388,29 @@ interface(`cron_initrc_domtrans',`
 
 ########################################
 ## <summary>
+##	Execute crond server in the crond domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`cron_systemctl',`
+	gen_require(`
+		type crond_unit_file_t;
+		type crond_t;
+	')
+
+	systemd_exec_systemctl($1)
+	allow $1 crond_unit_file_t:file read_file_perms;
+	allow $1 crond_unit_file_t:service manage_service_perms;
+
+	ps_process_pattern($1, crond_t)
+')
+
+########################################
+## <summary>
 ##	Use crond file descriptors.
 ## </summary>
 ## <param name="domain">
@@ -395,6 +425,24 @@ interface(`cron_use_fds',`
 	')
 
 	allow $1 crond_t:fd use;
+')
+
+########################################
+## <summary>
+##	Send a generic signal to cron daemon.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`cron_signal',`
+	gen_require(`
+		type crond_t;
+	')
+
+	allow $1 crond_t:process signal;
 ')
 
 ########################################
@@ -539,6 +587,46 @@ interface(`cron_read_pipes',`
 
 ########################################
 ## <summary>
+##	Read crond state files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`cron_read_state_crond',`
+	gen_require(`
+		type crond_t;
+	')
+
+	kernel_search_proc($1)
+	ps_process_pattern($1, crond_t)
+')
+
+########################################
+## <summary>
+##	Send and receive messages from
+##	crond over dbus.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`cron_dbus_chat_crond',`
+	gen_require(`
+		type crond_t;
+		class dbus send_msg;
+	')
+
+	allow $1 crond_t:dbus send_msg;
+	allow crond_t $1:dbus send_msg;
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to write
 ##	cron daemon unnamed pipes.
 ## </summary>
@@ -553,6 +641,7 @@ interface(`cron_dontaudit_write_pipes',`
 		type crond_t;
 	')
 
+	dontaudit $1 crond_t:fd use;
 	dontaudit $1 crond_t:fifo_file write;
 ')
 
@@ -571,7 +660,43 @@ interface(`cron_rw_pipes',`
 		type crond_t;
 	')
 
-	allow $1 crond_t:fifo_file rw_fifo_file_perms;
+	allow $1 crond_t:fifo_file rw_inherited_fifo_file_perms;
+')
+
+########################################
+## <summary>
+##	Read and write inherited user spool files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`cron_rw_inherited_user_spool_files',`
+	gen_require(`
+		type user_cron_spool_t;
+	')
+
+	allow $1 user_cron_spool_t:file rw_inherited_file_perms;
+')
+
+########################################
+## <summary>
+##	Read and write inherited spool files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`cron_rw_inherited_spool_files',`
+	gen_require(`
+		type cron_spool_t;
+	')
+
+	allow $1 cron_spool_t:file rw_inherited_file_perms;
 ')
 
 ########################################
@@ -632,6 +757,25 @@ interface(`cron_search_spool',`
 
 ########################################
 ## <summary>
+##	Search the directory containing user cron tables.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`cron_manage_system_spool',`
+	gen_require(`
+		type cron_system_spool_t;
+	')
+
+	files_search_spool($1)
+	manage_files_pattern($1, cron_system_spool_t, cron_system_spool_t)
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete
 ##	crond pid files.
 ## </summary>
@@ -646,6 +790,7 @@ interface(`cron_manage_pid_files',`
 		type crond_var_run_t;
 	')
 
+	files_search_pids($1)
 	manage_files_pattern($1, crond_var_run_t, crond_var_run_t)
 ')
 
@@ -741,7 +886,7 @@ interface(`cron_write_system_job_pipes',`
 		type system_cronjob_t;
 	')
 
-	allow $1 system_cronjob_t:file write;
+	allow $1 system_cronjob_t:fifo_file write;
 ')
 
 ########################################
@@ -760,7 +905,7 @@ interface(`cron_rw_system_job_pipes',`
 		type system_cronjob_t;
 	')
 
-	allow $1 system_cronjob_t:fifo_file rw_fifo_file_perms;
+	allow $1 system_cronjob_t:fifo_file rw_inherited_fifo_file_perms;
 ')
 
 ########################################
@@ -794,11 +939,14 @@ interface(`cron_rw_system_job_stream_sockets',`
 #
 interface(`cron_read_system_job_tmp_files',`
 	gen_require(`
-		type system_cronjob_tmp_t;
+		type system_cronjob_tmp_t, cron_var_run_t;
 	')
 
 	files_search_tmp($1)
 	allow $1 system_cronjob_tmp_t:file read_file_perms;
+
+	files_search_pids($1)
+	allow $1 cron_var_run_t:file read_file_perms;
 ')
 
 ########################################
@@ -834,7 +982,9 @@ interface(`cron_dontaudit_append_system_job_tmp_files',`
 interface(`cron_dontaudit_write_system_job_tmp_files',`
 	gen_require(`
 		type system_cronjob_tmp_t;
+		type cron_var_run_t;
 	')
 
 	dontaudit $1 system_cronjob_tmp_t:file write_file_perms;
+	dontaudit $1 cron_var_run_t:file write_file_perms;
 ')

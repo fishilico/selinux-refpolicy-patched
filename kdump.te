@@ -23,6 +23,9 @@ application_executable_file(kdumpctl_exec_t)
 type kdumpctl_tmp_t;
 files_tmp_file(kdumpctl_tmp_t)
 
+type kdump_unit_file_t;
+systemd_unit_file(kdump_unit_file_t)
+
 #####################################
 #
 # Local policy

@@ -33,12 +33,15 @@ type tor_var_run_t;
 files_pid_file(tor_var_run_t)
 init_daemon_pid_file(tor_var_run_t, dir, "tor")
 
+type tor_unit_file_t;
+systemd_unit_file(tor_unit_file_t)
+
 ########################################
 #
 # Local policy
 #
 
-allow tor_t self:capability { setgid setuid sys_tty_config };
+allow tor_t self:capability { chown dac_override fowner fsetid setgid setuid sys_tty_config };
 allow tor_t self:process signal;
 allow tor_t self:fifo_file rw_fifo_file_perms;
 allow tor_t self:unix_stream_socket { accept listen };
@@ -94,6 +97,8 @@ corenet_tcp_sendrecv_all_reserved_ports(tor_t)
 
 dev_read_sysfs(tor_t)
 dev_read_urand(tor_t)
+# for /sys/devices/system/cpu
+dev_list_sysfs(tor_t)
 
 domain_use_interactive_fds(tor_t)
 

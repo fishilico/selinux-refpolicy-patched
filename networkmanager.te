@@ -18,6 +18,9 @@ files_config_file(NetworkManager_etc_rw_t)
 type NetworkManager_initrc_exec_t;
 init_script_file(NetworkManager_initrc_exec_t)
 
+type NetworkManager_unit_file_t;
+systemd_unit_file(NetworkManager_unit_file_t)
+
 type NetworkManager_log_t;
 logging_log_file(NetworkManager_log_t)
 
@@ -317,6 +320,10 @@ optional_policy(`
 
 optional_policy(`
 	seutil_sigchld_newrole(NetworkManager_t)
+')
+
+optional_policy(`
+	systemd_read_logind_sessions_files(NetworkManager_t)
 ')
 
 optional_policy(`

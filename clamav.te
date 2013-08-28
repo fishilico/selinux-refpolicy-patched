@@ -38,6 +38,9 @@ files_config_file(clamd_etc_t)
 type clamd_initrc_exec_t;
 init_script_file(clamd_initrc_exec_t)
 
+type clamd_unit_file_t;
+systemd_unit_file(clamd_unit_file_t)
+
 type clamd_tmp_t;
 files_tmp_file(clamd_tmp_t)
 

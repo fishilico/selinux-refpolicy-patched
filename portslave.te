@@ -7,7 +7,6 @@ policy_module(portslave, 1.8.0)
 
 type portslave_t;
 type portslave_exec_t;
-init_domain(portslave_t, portslave_exec_t)
 init_daemon_domain(portslave_t, portslave_exec_t)
 
 type portslave_etc_t;

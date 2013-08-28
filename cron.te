@@ -71,6 +71,9 @@ domain_cron_exemption_source(crond_t)
 type crond_initrc_exec_t;
 init_script_file(crond_initrc_exec_t)
 
+type crond_unit_file_t;
+systemd_unit_file(crond_unit_file_t)
+
 type crond_tmp_t;
 files_tmp_file(crond_tmp_t)
 files_poly_parent(crond_tmp_t)
@@ -180,7 +183,7 @@ seutil_read_config(crontab_domain)
 
 userdom_manage_user_tmp_dirs(crontab_domain)
 userdom_manage_user_tmp_files(crontab_domain)
-userdom_use_user_terminals(crontab_domain)
+userdom_use_inherited_user_terminals(crontab_domain)
 userdom_read_user_home_content_files(crontab_domain)
 userdom_read_user_home_content_symlinks(crontab_domain)
 
@@ -301,6 +304,7 @@ selinux_compute_user_contexts(crond_t)
 init_read_state(crond_t)
 init_rw_utmp(crond_t)
 init_spec_domtrans_script(crond_t)
+init_read_state(crond_t)
 
 auth_domtrans_chk_passwd(crond_t)
 auth_manage_var_auth(crond_t)
@@ -411,6 +415,15 @@ optional_policy(`
 
 optional_policy(`
 	seutil_sigchld_newrole(crond_t)
+')
+
+optional_policy(`
+	systemd_use_fds_logind(crond_t)
+	systemd_write_inherited_logind_sessions_pipes(crond_t)
+')
+optional_policy(`
+	systemd_dbus_chat_logind(system_cronjob_t)
+	systemd_write_inherited_logind_sessions_pipes(system_cronjob_t)
 ')
 
 optional_policy(`

@@ -41,9 +41,10 @@ interface(`dbus_stub',`
 template(`dbus_role_template',`
 	gen_require(`
 		class dbus { send_msg acquire_svc };
-		attribute session_bus_type;
+		attribute dbusd_unconfined, session_bus_type;
 		type system_dbusd_t, dbusd_exec_t;
 		type session_dbusd_tmp_t, session_dbusd_home_t;
+		type $1_t;
 	')
 
 	##############################
@@ -52,8 +53,7 @@ template(`dbus_role_template',`
 	#
 
 	type $1_dbusd_t, session_bus_type;
-	domain_type($1_dbusd_t)
-	domain_entry_file($1_dbusd_t, dbusd_exec_t)
+	application_domain($1_dbusd_t, dbusd_exec_t)
 	ubac_constrained($1_dbusd_t)
 
 	role $2 types $1_dbusd_t;
@@ -66,7 +66,8 @@ template(`dbus_role_template',`
 	allow $3 $1_dbusd_t:unix_stream_socket connectto;
 	allow $3 $1_dbusd_t:dbus { send_msg acquire_svc };
 	allow $3 $1_dbusd_t:fd use;
-	
+
+	allow { dbusd_unconfined $3 } $1_dbusd_t:dbus { send_msg acquire_svc };
 	allow $3 system_dbusd_t:dbus { send_msg acquire_svc };
 
 	allow $3 { session_dbusd_home_t session_dbusd_tmp_t }:dir { manage_dir_perms relabel_dir_perms };
@@ -78,16 +79,48 @@ template(`dbus_role_template',`
 	ps_process_pattern($3, $1_dbusd_t)
 	allow $3 $1_dbusd_t:process { ptrace signal_perms };
 
+	tunable_policy(`deny_ptrace',`',`
+		allow $3 $1_dbusd_t:process ptrace;
+	')
+
 	allow $1_dbusd_t $3:process sigkill;
 
-	corecmd_bin_domtrans($1_dbusd_t, $3)
-	corecmd_shell_domtrans($1_dbusd_t, $3)
+	corecmd_bin_domtrans($1_dbusd_t, $1_t)
+	corecmd_shell_domtrans($1_dbusd_t, $1_t)
 
 	auth_use_nsswitch($1_dbusd_t)
 
 	ifdef(`hide_broken_symptoms',`
 		dontaudit $3 $1_dbusd_t:netlink_selinux_socket { read write };
 	')
+')
+
+#######################################
+## <summary>
+##	Creating connections to specified
+##	DBUS sessions.
+## </summary>
+## <param name="role_prefix">
+##	<summary>
+##	The prefix of the user role (e.g., user
+##	is the prefix for user_r).
+##	</summary>
+## </param>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dbus_session_client',`
+	gen_require(`
+		class dbus send_msg;
+		type $1_dbusd_t;
+	')
+
+	allow $2 $1_dbusd_t:fd use;
+	allow $2 { $1_dbusd_t self }:dbus send_msg;
+	allow $2 $1_dbusd_t:unix_stream_socket connectto;
 ')
 
 #######################################
@@ -104,6 +137,7 @@ template(`dbus_role_template',`
 interface(`dbus_system_bus_client',`
 	gen_require(`
 		attribute dbusd_system_bus_client;
+		attribute dbusd_unconfined;
 		type system_dbusd_t, system_dbusd_var_run_t, system_dbusd_var_lib_t;
 		class dbus send_msg;
 	')
@@ -111,7 +145,7 @@ interface(`dbus_system_bus_client',`
 	typeattribute $1 dbusd_system_bus_client;
 
 	allow $1 { system_dbusd_t self }:dbus send_msg;
-	allow system_dbusd_t $1:dbus send_msg;
+	allow { system_dbusd_t dbusd_unconfined } $1:dbus send_msg;
 
 	files_search_var_lib($1)
 	read_files_pattern($1, system_dbusd_var_lib_t, system_dbusd_var_lib_t)
@@ -173,6 +207,11 @@ interface(`dbus_connect_spec_session_bus',`
 ##	Creating connections to all
 ##	DBUS session busses.
 ## </summary>
+## <param name="domain_prefix">
+##	<summary>
+##	User domain prefix to be used.
+##	</summary>
+## </param>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
@@ -189,6 +228,7 @@ interface(`dbus_all_session_bus_client',`
 
 	allow $1 { session_bus_type self }:dbus send_msg;
 	allow session_bus_type $1:dbus send_msg;
+	allow session_bus_type $1:process sigkill;
 	
 	allow $1 session_bus_type:unix_stream_socket connectto;
 	allow $1 session_bus_type:fd use;
@@ -469,9 +509,11 @@ interface(`dbus_system_bus_unconfined',`
 #
 interface(`dbus_system_domain',`
 	gen_require(`
+		attribute system_bus_type;
 		type system_dbusd_t;
 		role system_r;
 	')
+	typeattribute $1  system_bus_type;
 
 	domain_type($1)
 	domain_entry_file($1, $2)
@@ -481,15 +523,6 @@ interface(`dbus_system_domain',`
 	domtrans_pattern(system_dbusd_t, $2, $1)
 
 	dbus_system_bus_client($1)
-	dbus_connect_system_bus($1)
-
-	ps_process_pattern(system_dbusd_t, $1)
-
-	userdom_read_all_users_state($1)
-
-	ifdef(`hide_broken_symptoms', `
-		dontaudit $1 system_dbusd_t:netlink_selinux_socket { read write };
-	')
 ')
 
 ########################################
@@ -513,26 +546,7 @@ interface(`dbus_use_system_bus_fds',`
 
 ########################################
 ## <summary>
-##	Do not audit attempts to read and
-##	write DBUS system bus TCP sockets.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain to not audit.
-##	</summary>
-## </param>
-#
-interface(`dbus_dontaudit_system_bus_rw_tcp_sockets',`
-	gen_require(`
-		type system_dbusd_t;
-	')
-
-	dontaudit $1 system_dbusd_t:tcp_socket { read write };
-')
-
-########################################
-## <summary>
-##	Unconfined access to DBUS.
+##	Unconfined access to DBUS
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -546,4 +560,63 @@ interface(`dbus_unconfined',`
 	')
 
 	typeattribute $1 dbusd_unconfined;
+')
+
+########################################
+## <summary>
+##	Delete all dbus pid files
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dbus_delete_pid_files',`
+	gen_require(`
+		type system_dbusd_var_run_t;
+	')
+
+	files_search_pids($1)
+	delete_files_pattern($1, system_dbusd_var_run_t, system_dbusd_var_run_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to connect to
+##	session bus types with a unix
+##	stream socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`dbus_dontaudit_stream_connect_session_bus',`
+	gen_require(`
+		attribute session_bus_type;
+	')
+
+	dontaudit $1 session_bus_type:unix_stream_socket connectto;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send dbus
+##	messages to session bus types.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`dbus_dontaudit_chat_session_bus',`
+	gen_require(`
+		attribute session_bus_type;
+		class dbus send_msg;
+	')
+
+	dontaudit $1 session_bus_type:dbus send_msg;
 ')

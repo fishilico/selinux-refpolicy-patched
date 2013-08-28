@@ -78,6 +78,24 @@ interface(`milter_getattr_all_sockets',`
 
 ########################################
 ## <summary>
+##	Allow setattr of milter dirs
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`milter_setattr_all_dirs',`
+	gen_require(`
+		attribute milter_data_type;
+	')
+
+	setattr_dirs_pattern($1, milter_data_type, milter_data_type)
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete
 ##	spamassissin milter data content.
 ## </summary>
@@ -96,4 +114,23 @@ interface(`milter_manage_spamass_state',`
 	manage_files_pattern($1, spamass_milter_state_t, spamass_milter_state_t)
 	manage_dirs_pattern($1, spamass_milter_state_t, spamass_milter_state_t)
 	manage_lnk_files_pattern($1, spamass_milter_state_t, spamass_milter_state_t)
+')
+
+#######################################
+## <summary>
+##	Delete dkim-milter PID files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`milter_delete_dkim_pid_files',`
+	gen_require(`
+		type dkim_milter_data_t;
+	')
+
+	files_search_pids($1)
+	delete_files_pattern($1, dkim_milter_data_t, dkim_milter_data_t)
 ')

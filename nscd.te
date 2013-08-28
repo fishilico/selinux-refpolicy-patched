@@ -31,6 +31,9 @@ role nscd_roles types nscd_t;
 type nscd_initrc_exec_t;
 init_script_file(nscd_initrc_exec_t)
 
+type nscd_unit_file_t;
+systemd_unit_file(nscd_unit_file_t)
+
 type nscd_log_t;
 logging_log_file(nscd_log_t)
 
