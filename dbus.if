@@ -90,6 +90,7 @@ template(`dbus_role_template',`
 
 	auth_use_nsswitch($1_dbusd_t)
 	init_search_pid_dirs($1_dbusd_t)
+	fs_search_cgroup_dirs($1_dbusd_t)
 	optional_policy(`
 		consolekit_read_pid_files($1_dbusd_t)
 	')

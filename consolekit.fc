@@ -7,3 +7,4 @@
 /var/run/ConsoleKit(/.*)?	gen_context(system_u:object_r:consolekit_var_run_t,s0)
 /var/run/consolekit\.pid	--	gen_context(system_u:object_r:consolekit_var_run_t,s0)
 /var/run/console-kit-daemon\.pid	--	gen_context(system_u:object_r:consolekit_var_run_t,s0)
+/var/run/console(/.*)?			gen_context(system_u:object_r:consolekit_var_run_t,s0)

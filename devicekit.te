@@ -126,6 +126,7 @@ fs_manage_fusefs_dirs(devicekit_disk_t)
 fs_mount_all_fs(devicekit_disk_t)
 fs_unmount_all_fs(devicekit_disk_t)
 fs_search_all(devicekit_disk_t)
+fs_getattr_xattr_fs(devicekit_disk_t)
 
 mls_file_read_all_levels(devicekit_disk_t)
 mls_file_write_to_clearance(devicekit_disk_t)
@@ -268,6 +269,10 @@ sysnet_domtrans_ifconfig(devicekit_power_t)
 sysnet_domtrans_dhcpc(devicekit_power_t)
 
 userdom_read_all_users_state(devicekit_power_t)
+
+optional_policy(`
+	dev_getattr_apm_bios_dev(devicekit_power_t)
+')
 
 optional_policy(`
 	bootloader_domtrans(devicekit_power_t)
