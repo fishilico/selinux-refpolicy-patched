@@ -57,6 +57,9 @@ dev_read_sysfs(gpm_t)
 dev_rw_input_dev(gpm_t)
 dev_rw_mouse(gpm_t)
 
+# Init script tests read access to the mouse before launching gpm
+dev_read_mouse(initrc_t)
+
 files_read_etc_files(gpm_t)
 
 fs_getattr_all_fs(gpm_t)
