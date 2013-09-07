@@ -57,7 +57,7 @@ optional_policy(`
 ')
 
 type mpd_var_lib_t;
-files_type(mpd_var_lib_t)
+files_pid_file(mpd_var_lib_t)
 
 type mpd_user_data_t;
 userdom_user_home_content(mpd_user_data_t) # customizable
