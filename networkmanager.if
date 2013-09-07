@@ -213,6 +213,26 @@ interface(`networkmanager_read_lib_files',`
 
 ########################################
 ## <summary>
+##	Read and write networkmanager lib files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`networkmanager_rw_lib_files',`
+	gen_require(`
+		type NetworkManager_var_lib_t;
+	')
+
+	files_search_var_lib($1)
+	list_dirs_pattern($1, NetworkManager_var_lib_t, NetworkManager_var_lib_t)
+	rw_files_pattern($1, NetworkManager_var_lib_t, NetworkManager_var_lib_t)
+')
+
+########################################
+## <summary>
 ##	Append networkmanager log files.
 ## </summary>
 ## <param name="domain">
