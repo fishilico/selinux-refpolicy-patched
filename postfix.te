@@ -634,6 +634,7 @@ optional_policy(`
 #
 
 allow postfix_postqueue_t self:capability { setuid setgid };
+allow postfix_postqueue_t self:capability2 block_suspend;
 allow postfix_postqueue_t postfix_spool_maildrop_t:dir list_dir_perms;
 allow postfix_postqueue_t postfix_spool_maildrop_t:file read_file_perms;
 allow postfix_postqueue_t postfix_spool_t:file read_file_perms;
