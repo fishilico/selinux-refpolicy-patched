@@ -144,6 +144,7 @@ manage_sock_files_pattern(lpd_t, lpd_var_run_t, lpd_var_run_t)
 files_pid_filetrans(lpd_t, lpd_var_run_t, { dir file })
 
 manage_files_pattern(lpd_t, print_spool_t, print_spool_t)
+manage_lnk_files_pattern(lpd_t, print_spool_t, print_spool_t)
 
 allow lpd_t printconf_t:dir list_dir_perms;
 
