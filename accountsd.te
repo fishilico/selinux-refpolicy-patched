@@ -50,6 +50,8 @@ auth_read_shadow(accountsd_t)
 
 miscfiles_read_localization(accountsd_t)
 
+init_dbus_chat(accountsd_t)
+
 logging_list_logs(accountsd_t)
 logging_send_syslog_msg(accountsd_t)
 logging_set_loginuid(accountsd_t)
@@ -63,6 +65,10 @@ usermanage_domtrans_passwd(accountsd_t)
 optional_policy(`
 	consolekit_dbus_chat(accountsd_t)
 	consolekit_read_log(accountsd_t)
+')
+
+optional_policy(`
+	dbus_system_domain(accountsd_t, accountsd_exec_t)
 ')
 
 optional_policy(`
