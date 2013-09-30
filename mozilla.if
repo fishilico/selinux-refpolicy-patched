@@ -181,6 +181,27 @@ interface(`mozilla_write_user_home_files',`
 
 ########################################
 ## <summary>
+##	Read, write, and delete mozilla
+##	home directory content.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`mozilla_manage_user_home_files',`
+	gen_require(`
+		type mozilla_home_t;
+	')
+
+	allow $1 mozilla_home_t:dir manage_dir_perms;
+	allow $1 mozilla_home_t:file manage_file_perms;
+	allow $1 mozilla_home_t:lnk_file manage_lnk_file_perms;
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to read and
 ##	write mozilla home directory files.
 ## </summary>
