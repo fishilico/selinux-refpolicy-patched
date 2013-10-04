@@ -125,6 +125,11 @@ optional_policy(`
 	kerberos_tmp_filetrans_host_rcache(policykit_t, file, "host_0")
 ')
 
+optional_policy(`
+	# Policykit reads /var/run/systemd/sessions
+	systemd_read_logind_sessions_files(policykit_t)
+')
+
 ########################################
 #
 # Auth local policy
