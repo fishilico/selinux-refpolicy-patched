@@ -323,6 +323,7 @@ optional_policy(`
 ')
 
 optional_policy(`
+	systemd_login_read_pid_files(NetworkManager_t)
 	systemd_read_logind_sessions_files(NetworkManager_t)
 ')
 
