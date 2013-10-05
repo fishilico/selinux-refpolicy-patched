@@ -33,7 +33,7 @@ apache_content_template(collectd)
 # Local policy
 #
 
-allow collectd_t self:capability { ipc_lock sys_nice };
+allow collectd_t self:capability { dac_override ipc_lock sys_nice };
 allow collectd_t self:process { getsched setsched signal };
 allow collectd_t self:fifo_file rw_fifo_file_perms;
 allow collectd_t self:packet_socket create_socket_perms;
@@ -56,11 +56,15 @@ dev_read_rand(collectd_t)
 dev_read_sysfs(collectd_t)
 dev_read_urand(collectd_t)
 
+domain_read_all_domains_state(collectd_t)
+
 files_getattr_all_dirs(collectd_t)
 files_read_etc_files(collectd_t)
 files_read_usr_files(collectd_t)
 
 fs_getattr_all_fs(collectd_t)
+
+init_read_utmp(collectd_t)
 
 miscfiles_read_localization(collectd_t)
 

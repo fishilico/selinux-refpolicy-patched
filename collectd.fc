@@ -7,3 +7,5 @@
 /var/run/collectd\.pid	--	gen_context(system_u:object_r:collectd_var_run_t,s0)
 
 /usr/share/collectd/collection3/bin/.*\.cgi	--	gen_context(system_u:object_r:httpd_collectd_script_exec_t,s0)
+/usr/share/doc/collectd-core/examples/collection3/bin/.*\.cgi	--	gen_context(system_u:object_r:httpd_collectd_script_exec_t,s0)
+/usr/share/doc/collectd-core/examples/collection3/share(/.*)?		gen_context(system_u:object_r:httpd_sys_content_t,s0)
