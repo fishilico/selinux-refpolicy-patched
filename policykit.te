@@ -128,6 +128,7 @@ optional_policy(`
 optional_policy(`
 	# Policykit reads /var/run/systemd/sessions
 	systemd_read_logind_sessions_files(policykit_t)
+	systemd_login_read_pid_files(policykit_t)
 ')
 
 ########################################
