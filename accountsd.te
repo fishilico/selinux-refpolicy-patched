@@ -11,7 +11,11 @@ gen_require(`
 
 type accountsd_t;
 type accountsd_exec_t;
+init_system_domain(accountsd_t, accountsd_exec_t)
 dbus_system_domain(accountsd_t, accountsd_exec_t)
+
+type accountsd_unit_file_t;
+systemd_unit_file(accountsd_unit_file_t)
 
 type accountsd_var_lib_t;
 files_type(accountsd_var_lib_t)
