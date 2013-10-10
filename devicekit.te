@@ -265,6 +265,8 @@ auth_use_nsswitch(devicekit_power_t)
 
 init_all_labeled_script_domtrans(devicekit_power_t)
 init_read_utmp(devicekit_power_t)
+init_stream_connect(devicekit_power_t)
+init_rw_stream_sockets(devicekit_power_t)
 
 miscfiles_read_localization(devicekit_power_t)
 
