@@ -337,3 +337,21 @@ interface(`networkmanager_admin',`
 	files_search_tmp($1)
 	admin_pattern($1, NetworkManager_tmp_t)
 ')
+
+########################################
+## <summary>
+##	Write networkmanager socket files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`networkmanager_write_sockets',`
+	gen_require(`
+		type NetworkManager_var_run_t;
+	')
+
+	write_sock_files_pattern($1, NetworkManager_var_run_t, NetworkManager_var_run_t)
+')
