@@ -90,7 +90,9 @@ domain_read_all_domains_state(policykit_t)
 
 files_dontaudit_search_all_mountpoints(policykit_t)
 
+fs_list_cgroup_dirs(policykit_t)
 fs_list_inotifyfs(policykit_t)
+fs_getattr_xattr_fs(policykit_t)
 
 auth_use_nsswitch(policykit_t)
 
@@ -129,6 +131,7 @@ optional_policy(`
 	# Policykit reads /var/run/systemd/sessions
 	systemd_read_logind_sessions_files(policykit_t)
 	systemd_login_read_pid_files(policykit_t)
+	systemd_login_list_pid_dirs(policykit_t)
 ')
 
 ########################################
