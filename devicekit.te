@@ -104,6 +104,7 @@ dev_getattr_usbfs_dirs(devicekit_disk_t)
 dev_manage_generic_files(devicekit_disk_t)
 dev_read_urand(devicekit_disk_t)
 dev_rw_sysfs(devicekit_disk_t)
+dev_rw_generic_blk_files(devicekit_disk_t)
 
 domain_getattr_all_pipes(devicekit_disk_t)
 domain_getattr_all_sockets(devicekit_disk_t)
