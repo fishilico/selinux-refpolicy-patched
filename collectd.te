@@ -64,6 +64,9 @@ files_read_usr_files(collectd_t)
 
 fs_getattr_all_fs(collectd_t)
 
+# For collectdmon
+can_exec(collectd_t, collectd_exec_t)
+
 init_read_utmp(collectd_t)
 
 miscfiles_read_localization(collectd_t)
