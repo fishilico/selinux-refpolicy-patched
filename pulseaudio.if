@@ -162,6 +162,7 @@ interface(`pulseaudio_stream_connect',`
 	')
 
 	files_search_pids($1)
+	auth_search_var_auth($1)
 	stream_connect_pattern($1, { pulseaudio_tmp_t pulseaudio_var_run_t }, { pulseaudio_tmp_t pulseaudio_var_run_t }, pulseaudio_t)
 ')
 
