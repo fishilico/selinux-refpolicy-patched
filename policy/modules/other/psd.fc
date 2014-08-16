@@ -1,0 +1,11 @@
+HOME_DIR/\.config/chromium-backup(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+HOME_DIR/.opera-backup(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+
+/usr/bin/profile-sync-daemon		--	gen_context(system_u:object_r:psd_exec_t,s0)
+
+/tmp/[^/]+-chromium(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+/tmp/[^/]+-firefox-[^/]+(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+/tmp/[^/]+-opera(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+
+/var/run/psd	--		gen_context(system_u:object_r:psd_var_run_t,s0)
+/var/run/psd\.conf	--		gen_context(system_u:object_r:psd_var_run_t,s0)

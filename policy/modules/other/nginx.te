@@ -1,0 +1,165 @@
+# SELinux module for the NGINX Web Server
+policy_module(nginx,1.0.10)
+
+########################################
+#
+# Declarations
+#
+
+## <desc>
+## <p>
+## Allow nginx to serve HTTP content (act as an http server)
+## </p>
+## </desc>
+gen_tunable(nginx_enable_http_server, false)
+
+## <desc>
+## <p>
+## Allow nginx to act as an imap proxy server)
+## </p>
+## </desc>
+gen_tunable(nginx_enable_imap_server, false)
+
+## <desc>
+## <p>
+## Allow nginx to act as a pop3 server)
+## </p>
+## </desc>
+gen_tunable(nginx_enable_pop3_server, false)
+
+## <desc>
+## <p>
+## Allow nginx to act as an smtp server)
+## </p>
+## </desc>
+gen_tunable(nginx_enable_smtp_server, false)
+
+## <desc>
+## <p>
+## Allow nginx to connect to remote HTTP servers
+## </p>
+## </desc>
+gen_tunable(nginx_can_network_connect_http, false)
+
+## <desc>
+## <p>
+## Allow nginx to connect to remote servers (regardless of protocol)
+## </p>
+## </desc>
+gen_tunable(nginx_can_network_connect, false)
+
+type nginx_t;
+type nginx_exec_t;
+init_daemon_domain(nginx_t, nginx_exec_t)
+
+# conf files
+type nginx_conf_t;
+files_type(nginx_conf_t)
+
+# log files
+type nginx_log_t;
+logging_log_file(nginx_log_t)
+
+# tmp files
+type nginx_tmp_t;
+files_tmp_file(nginx_tmp_t)
+
+# var/lib files
+type nginx_var_lib_t;
+files_type(nginx_var_lib_t)
+
+# pid files
+type nginx_var_run_t;
+files_pid_file(nginx_var_run_t)
+
+########################################
+#
+# nginx local policy
+#
+
+allow nginx_t self:process signal;
+allow nginx_t self:fifo_file { read write };
+allow nginx_t self:unix_stream_socket create_stream_socket_perms;
+allow nginx_t self:tcp_socket { listen accept };
+allow nginx_t self:capability { setuid net_bind_service setgid chown };
+
+# conf files
+list_dirs_pattern(nginx_t, nginx_conf_t, nginx_conf_t)
+read_files_pattern(nginx_t, nginx_conf_t, nginx_conf_t)
+read_lnk_files_pattern(nginx_t, nginx_conf_t, nginx_conf_t)
+
+# init script needs to read config files
+read_files_pattern(initrc_t, nginx_conf_t, nginx_conf_t)
+
+# log files
+manage_files_pattern(nginx_t, nginx_log_t, nginx_log_t)
+logging_log_filetrans(nginx_t, nginx_log_t, { file dir })
+
+
+# pid file
+manage_dirs_pattern(nginx_t, nginx_var_run_t, nginx_var_run_t)
+manage_files_pattern(nginx_t, nginx_var_run_t, nginx_var_run_t)
+files_pid_filetrans(nginx_t, nginx_var_run_t, file)
+
+# tmp files
+manage_files_pattern(nginx_t, nginx_tmp_t, nginx_tmp_t)
+manage_dirs_pattern(nginx_t, nginx_tmp_t, nginx_tmp_t)
+files_tmp_filetrans(nginx_t, nginx_tmp_t, dir)
+
+# var/lib files
+create_files_pattern(nginx_t, nginx_var_lib_t, nginx_var_lib_t)
+create_sock_files_pattern(nginx_t, nginx_var_lib_t, nginx_var_lib_t)
+files_var_lib_filetrans(nginx_t,nginx_var_lib_t, { file dir sock_file })
+
+dev_read_cpu_online(nginx_t)
+
+kernel_read_kernel_sysctls(nginx_t)
+corenet_tcp_bind_http_port(nginx_t)
+corenet_tcp_bind_generic_node(nginx_t)
+corenet_tcp_sendrecv_generic_if(nginx_t)
+corenet_tcp_sendrecv_generic_node(nginx_t)
+
+dev_read_rand(nginx_t)
+dev_read_urand(nginx_t)
+
+domain_use_interactive_fds(nginx_t)
+
+files_read_etc_files(nginx_t)
+miscfiles_read_generic_certs(nginx_t)
+
+
+miscfiles_read_localization(nginx_t)
+sysnet_dns_name_resolve(nginx_t)
+
+
+tunable_policy(`nginx_enable_http_server',`
+	apache_manage_all_content(nginx_t)
+')
+
+# We enable both binding and connecting, since nginx acts here as a reverse proxy
+tunable_policy(`nginx_enable_imap_server',`
+	corenet_tcp_bind_pop_port(nginx_t)
+	corenet_tcp_connect_pop_port(nginx_t)
+')
+
+tunable_policy(`nginx_enable_pop3_server',`
+	corenet_tcp_bind_pop_port(nginx_t)
+	corenet_tcp_connect_pop_port(nginx_t)
+')
+
+tunable_policy(`nginx_enable_smtp_server',`
+	corenet_tcp_bind_smtp_port(nginx_t)
+	corenet_tcp_connect_smtp_port(nginx_t)
+')
+
+tunable_policy(`nginx_can_network_connect_http',`
+	corenet_tcp_connect_http_port(nginx_t)
+')
+
+tunable_policy(`nginx_can_network_connect',`
+	corenet_tcp_connect_all_ports(nginx_t)
+')
+
+optional_policy(`
+	phpfpm_stream_connect(nginx_t)
+')

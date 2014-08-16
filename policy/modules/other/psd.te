@@ -1,0 +1,83 @@
+policy_module(psd, 0.0.1)
+
+########################################
+#
+# Declarations
+#
+
+type psd_t;
+type psd_exec_t;
+init_daemon_domain(psd_t, psd_exec_t)
+# psd relabels files and hence needs to change user in contexts
+domain_obj_id_change_exemption(psd_t)
+
+type psd_etc_t;
+files_config_file(psd_etc_t)
+
+type psd_tmp_t;
+files_tmp_file(psd_tmp_t)
+
+type psd_tmpfs_t;
+files_tmpfs_file(psd_tmpfs_t)
+
+type psd_var_run_t;
+files_pid_file(psd_var_run_t)
+
+########################################
+#
+# Local policy
+#
+
+allow psd_t self:capability { dac_override fowner chown fsetid };
+allow psd_t self:fifo_file rw_fifo_file_perms;
+allow psd_t self:process {getsched signal};
+
+corecmd_exec_bin(psd_t)
+corecmd_exec_shell(psd_t)
+rsync_exec(psd_t)
+
+manage_dirs_pattern(psd_t, psd_tmp_t, psd_tmp_t)
+manage_files_pattern(psd_t, psd_tmp_t, psd_tmp_t)
+manage_lnk_files_pattern(psd_t, psd_tmp_t, psd_tmp_t)
+files_tmp_filetrans(psd_t, psd_tmp_t, { file dir lnk_file })
+
+manage_files_pattern(psd_t, psd_tmpfs_t, psd_tmpfs_t)
+manage_lnk_files_pattern(psd_t, psd_tmpfs_t, psd_tmpfs_t)
+fs_tmpfs_filetrans(psd_t, psd_tmpfs_t, { dir file lnk_file })
+
+manage_files_pattern(psd_t, psd_var_run_t, psd_var_run_t)
+files_pid_filetrans(psd_t, psd_var_run_t, file)
+
+# Silent pgrep!
+dontaudit psd_t domain:dir getattr;
+
+mozilla_manage_user_home_files(psd_t)
+
+auth_use_nsswitch(psd_t)
+dev_read_cpu_online(psd_t)
+
+# for /proc/meminfo
+kernel_read_system_state(psd_t)
+
+miscfiles_read_localization(psd_t)
+
+optional_policy(`
+	mozilla_write_user_home_files(psd_t)
+')
+
+# This policy is way too generic but need better file labeling for home dir
+# before removing
+optional_policy(`
+	userdom_manage_user_home_dirs(psd_t)
+	userdom_manage_user_home_content_dirs(psd_t)
+	userdom_manage_user_home_content_symlinks(psd_t)
+')
+
+# psd relabels (with rsync) files in home directories
+# This is ugly but an interface in mozilla module is missing for this
+optional_policy(`
+	gen_require(`
+		type mozilla_home_t;
+	')
+	allow psd_t mozilla_home_t:file relabel_file_perms ;
+')

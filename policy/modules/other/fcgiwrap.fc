@@ -1,0 +1,5 @@
+/usr/((s))?bin/fcgiwrap	--		gen_context(system_u:object_r:fcgiwrap_exec_t,s0)
+/usr/((s))?bin/spawn-fcgi.*		gen_context(system_u:object_r:fcgiwrap_spawn_exec_t,s0)
+
+/var/run/fcgiwrap\.pids	--		gen_context(system_u:object_r:fcgiwrap_var_run_t,s0)
+/var/run/fcgiwrap\.socket	-s		gen_context(system_u:object_r:fcgiwrap_var_run_t,s0)

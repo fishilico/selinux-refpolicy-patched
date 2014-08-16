@@ -1,0 +1,64 @@
+policy_module(autoneighxy, 0.0.1)
+
+########################################
+#
+# Declarations
+#
+
+type autoneighxy_t;
+type autoneighxy_exec_t;
+init_daemon_domain(autoneighxy_t, autoneighxy_exec_t)
+application_executable_file(autoneighxy_exec_t)
+role system_r types autoneighxy_t;
+
+########################################
+#
+# Local policy
+#
+
+allow autoneighxy_t self:capability { net_admin net_raw setgid setuid };
+
+miscfiles_read_localization(autoneighxy_t)
+
+# Send logs with syslog
+logging_send_syslog_msg(autoneighxy_t)
+
+# Python rules
+files_read_etc_files(autoneighxy_t)
+files_read_usr_files(autoneighxy_t)
+files_manage_generic_tmp_files(autoneighxy_t)
+
+# Scapy needs to run shell with some temporary files (and this is bad)
+gen_require(`
+	type tmp_t;
+')
+exec_files_pattern(autoneighxy_t, tmp_t, tmp_t)
+corecmd_exec_shell(autoneighxy_t)
+allow autoneighxy_t self:tcp_socket create_stream_socket_perms;
+allow autoneighxy_t self:udp_socket create_stream_socket_perms;
+
+# Other denied Scapy policy
+fs_dontaudit_getattr_xattr_fs(autoneighxy_t)
+userdom_dontaudit_search_user_home_dirs(autoneighxy_t)
+
+# Run ip and tcpdump command
+netutils_exec(autoneighxy_t)
+sysnet_exec_ifconfig(autoneighxy_t)
+
+# Filesystem access required to run "ip"
+corecmd_exec_bin(autoneighxy_t)
+
+# Use pipes to communicate with processes
+allow autoneighxy_t self:fifo_file rw_fifo_file_perms;
+
+# Allow network-related stuff
+kernel_use_fds(autoneighxy_t)
+kernel_read_system_state(autoneighxy_t)
+kernel_read_network_state(autoneighxy_t)
+kernel_rw_net_sysctls(autoneighxy_t)
+allow autoneighxy_t self:packet_socket create_socket_perms;
+allow autoneighxy_t self:netlink_route_socket rw_netlink_socket_perms;
+
+optional_policy(`
+	pythonsupport_compiled_read(autoneighxy_t)
+')

@@ -1,0 +1,2 @@
+/srv/git(/.*)?    gen_context(system_u:object_r:httpd_sys_content_t,s0)
+/mnt/data/web(/.*)?    gen_context(system_u:object_r:httpd_user_rw_content_t,s0)

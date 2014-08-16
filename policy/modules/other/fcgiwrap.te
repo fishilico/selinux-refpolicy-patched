@@ -1,0 +1,64 @@
+policy_module(fcgiwrap, 0.1)
+
+#######################################
+#
+# Declarations
+#
+
+type fcgiwrap_t;
+type fcgiwrap_exec_t;
+init_daemon_domain(fcgiwrap_t, fcgiwrap_exec_t)
+
+type fcgiwrap_spawn_t;
+type fcgiwrap_spawn_exec_t;
+init_daemon_domain(fcgiwrap_spawn_t, fcgiwrap_spawn_exec_t)
+
+type fcgiwrap_var_run_t;
+files_pid_file(fcgiwrap_var_run_t)
+
+#######################################
+#
+# Fastcgi spawn local policy
+#
+
+allow fcgiwrap_spawn_t self:capability { setuid chown setgid };
+
+domtrans_pattern(fcgiwrap_spawn_t, fcgiwrap_exec_t, fcgiwrap_t)
+
+manage_files_pattern(fcgiwrap_spawn_t, fcgiwrap_var_run_t, fcgiwrap_var_run_t)
+manage_sock_files_pattern(fcgiwrap_spawn_t, fcgiwrap_var_run_t, fcgiwrap_var_run_t)
+files_pid_filetrans(fcgiwrap_spawn_t, fcgiwrap_var_run_t, { file sock_file })
+
+auth_use_nsswitch(fcgiwrap_spawn_t)
+
+kernel_read_kernel_sysctls(fcgiwrap_spawn_t)
+
+# Allow nginx to connect to fcgi socket
+optional_policy(`
+	gen_require(`
+		type nginx_t;
+	')
+	files_search_pids(nginx_t)
+	stream_connect_pattern(nginx_t, fcgiwrap_var_run_t, fcgiwrap_var_run_t, fcgiwrap_spawn_t)
+')
+
+#######################################
+#
+# Fastcgi local policy
+#
+allow fcgiwrap_t self:fifo_file read_fifo_file_perms;
+allow fcgiwrap_t fcgiwrap_spawn_t:unix_stream_socket server_stream_socket_perms;
+
+corecmd_exec_bin(fcgiwrap_t)
+
+optional_policy(`
+	apache_manage_all_content(fcgiwrap_t)
+	apache_domtrans_all_scripts(fcgiwrap_t)
+')
+
+optional_policy(`
+	gen_require(`
+		attribute httpd_script_domains;
+	')
+	allow httpd_script_domains fcgiwrap_spawn_t:unix_stream_socket client_stream_socket_perms;
+')

@@ -1,0 +1,98 @@
+policy_module(laptopmode, 0.0.1)
+
+########################################
+#
+# Declarations
+#
+
+type laptopmode_t;
+type laptopmode_exec_t;
+init_daemon_domain(laptopmode_t, laptopmode_exec_t)
+
+type laptopmode_lock_t;
+files_lock_file(laptopmode_lock_t)
+
+type laptopmode_unit_file_t;
+systemd_unit_file(laptopmode_unit_file_t)
+
+type laptopmode_var_run_t;
+files_pid_file(laptopmode_var_run_t)
+
+########################################
+#
+# Local policy
+#
+
+allow laptopmode_t self:process getsched;
+allow laptopmode_t self:fifo_file rw_fifo_file_perms;
+dontaudit laptopmode_t self:capability sys_tty_config;
+
+manage_files_pattern(laptopmode_t, laptopmode_lock_t, laptopmode_lock_t)
+files_lock_filetrans(laptopmode_t, laptopmode_lock_t, file)
+
+manage_dirs_pattern(laptopmode_t, laptopmode_var_run_t, laptopmode_var_run_t)
+manage_files_pattern(laptopmode_t, laptopmode_var_run_t, laptopmode_var_run_t)
+files_pid_filetrans(laptopmode_t, laptopmode_var_run_t, {dir file})
+
+files_exec_usr_files(laptopmode_t)
+
+auth_use_nsswitch(laptopmode_t)
+corecmd_exec_bin(laptopmode_t)
+corecmd_exec_shell(laptopmode_t)
+init_read_utmp(laptopmode_t)
+logging_send_syslog_msg(laptopmode_t)
+miscfiles_read_localization(laptopmode_t)
+
+fstools_exec(laptopmode_t)
+dev_rw_sysfs(laptopmode_t)
+kernel_read_system_state(laptopmode_t)
+kernel_rw_fs_sysctls(laptopmode_t)
+kernel_rw_kernel_sysctl(laptopmode_t)
+kernel_rw_vm_sysctls(laptopmode_t)
+modutils_domtrans_insmod(laptopmode_t)
+sysnet_domtrans_ifconfig(laptopmode_t)
+
+# blockdev
+storage_raw_read_fixed_disk(laptopmode_t)
+
+domain_dontaudit_read_all_domains_state(laptopmode_t)
+
+# laptopmode remounts devices that need to be controlled
+optional_policy(`
+	mount_domtrans(laptopmode_t)
+')
+
+optional_policy(`
+	xserver_read_xdm_tmp_files(laptopmode_t)
+	xserver_stream_connect_xdm(laptopmode_t)
+')
+
+# Allow udev to run /etc/power/scripts\.d/laptop-mode
+optional_policy(`
+	gen_require(`
+		type udev_t;
+	')
+	domtrans_pattern(udev_t, laptopmode_exec_t, laptopmode_t)
+
+	udev_domtrans(laptopmode_t)
+')
+
+# Allow udev, ifconfig and mount to access to lock (TODO: move this to .if when integrating with contrib)
+optional_policy(`
+	gen_require(`
+		type udev_t, var_lock_t;
+	')
+	write_files_pattern(udev_t, var_lock_t, laptopmode_lock_t)
+')
+optional_policy(`
+	gen_require(`
+		type ifconfig_t, var_lock_t;
+	')
+	write_files_pattern(ifconfig_t, var_lock_t, laptopmode_lock_t)
+')
+optional_policy(`
+	gen_require(`
+		type mount_t, var_lock_t;
+	')
+	write_files_pattern(mount_t, var_lock_t, laptopmode_lock_t)
+')
