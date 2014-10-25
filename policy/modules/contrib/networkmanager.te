@@ -49,6 +49,7 @@ allow NetworkManager_t self:netlink_route_socket create_netlink_socket_perms;
 allow NetworkManager_t self:netlink_socket create_socket_perms;
 allow NetworkManager_t self:netlink_generic_socket create_socket_perms;
 allow NetworkManager_t self:netlink_kobject_uevent_socket create_socket_perms;
+allow NetworkManager_t self:rawip_socket create_socket_perms;
 allow NetworkManager_t self:tcp_socket { accept listen };
 allow NetworkManager_t self:tun_socket { create_socket_perms relabelfrom relabelto };
 allow NetworkManager_t self:packet_socket create_socket_perms;
