@@ -1,0 +1,7 @@
+# Only build travis branches
+branches:
+  only:
+    - /^travis-.*/
+
+notifications:
+  email: false
