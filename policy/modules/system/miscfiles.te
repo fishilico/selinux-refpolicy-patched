@@ -24,6 +24,12 @@ type fonts_cache_t;
 files_type(fonts_cache_t)
 
 #
+# type for files written by systemd-hostnamectl
+#
+type hostname_etc_t;
+files_config_file(hostname_etc_t)
+
+#
 # type for /usr/share/hwdata
 #
 type hwdata_t;
