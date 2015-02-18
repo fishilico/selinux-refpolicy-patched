@@ -17,4 +17,4 @@
 /policy/modules.conf
 /policy/modules/kernel/corenetwork.if
 /policy/modules/kernel/corenetwork.te
-/tmp/
+/tmp

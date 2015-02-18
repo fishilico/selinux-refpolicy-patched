@@ -43,6 +43,12 @@ tmpdir := tmp
 tags := tags
 endif
 
+# If $(tmpdir) is a symlink, read it
+tmpdir_link := $(shell readlink $(tmpdir) 2>/dev/null)
+ifneq ($(tmpdir_link),)
+override tmpdir := $(tmpdir_link)
+endif
+
 # executable paths
 BINDIR ?= /usr/bin
 SBINDIR ?= /usr/sbin
