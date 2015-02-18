@@ -64,7 +64,7 @@ gen_tunable(console_login,true)
 ## be allowed to read from /dev/urandom.
 ## </p>
 ## </desc>
-gen_tunable(global_ssp,false)
+gen_tunable(global_ssp,true)
 
 ## <desc>
 ## <p>

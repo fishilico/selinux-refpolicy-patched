@@ -10,7 +10,7 @@ policy_module(mount, 1.18.0)
 ## Allow the mount command to mount any directory or file.
 ## </p>
 ## </desc>
-gen_tunable(allow_mount_anyfile, false)
+gen_tunable(allow_mount_anyfile, true)
 
 attribute_role mount_roles;
 roleattribute system_r mount_roles;

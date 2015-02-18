@@ -42,7 +42,7 @@ gen_tunable(httpd_can_check_spam, false)
 ##	can connect to the network using TCP.
 ##	</p>
 ## </desc>
-gen_tunable(httpd_can_network_connect, false)
+gen_tunable(httpd_can_network_connect, true)
 
 ## <desc>
 ##	<p>
@@ -111,7 +111,7 @@ gen_tunable(httpd_dbus_avahi, false)
 ##	Determine wether httpd can use support.
 ##	</p>
 ## </desc>
-gen_tunable(httpd_enable_cgi, false)
+gen_tunable(httpd_enable_cgi, true)
 
 ## <desc>
 ##	<p>
@@ -234,7 +234,7 @@ gen_tunable(httpd_use_cifs, false)
 ##	use fuse file systems.
 ##	</p>
 ## </desc>
-gen_tunable(httpd_use_fusefs, false)
+gen_tunable(httpd_use_fusefs, true)
 
 ## <desc>
 ##	<p>
