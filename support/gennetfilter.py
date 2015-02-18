@@ -49,7 +49,7 @@ def print_input_rules(packets,mls,mcs):
 	elif mcs:
 		line += ":"+DEFAULT_MCS
 
-	print line
+	print(line)
 
 	for i in packets:
 		for j in i.ports:
@@ -58,10 +58,10 @@ def print_input_rules(packets,mls,mcs):
 				line += ":"+j.mls_sens
 			elif mcs:
 				line += ":"+j.mcs_cats
-			print line
+			print(line)
 
-	print "post -A selinux_new_input -j CONNSECMARK --save"
-	print "post -A selinux_new_input -j RETURN"
+	print("post -A selinux_new_input -j CONNSECMARK --save")
+	print("post -A selinux_new_input -j RETURN")
 
 def print_output_rules(packets,mls,mcs):
 	line = "base -A selinux_new_output -j SECMARK --selctx system_u:object_r:"+DEFAULT_OUTPUT_PACKET
@@ -69,7 +69,7 @@ def print_output_rules(packets,mls,mcs):
 		line += ":"+DEFAULT_MLS
 	elif mcs:
 		line += ":"+DEFAULT_MCS
-	print line
+	print(line)
 
 	for i in packets:
 		for j in i.ports:
@@ -78,10 +78,10 @@ def print_output_rules(packets,mls,mcs):
 				line += ":"+j.mls_sens
 			elif mcs:
 				line += ":"+j.mcs_cats
-			print line
+			print(line)
 
-	print "post -A selinux_new_output -j CONNSECMARK --save"
-	print "post -A selinux_new_output -j RETURN"
+	print("post -A selinux_new_output -j CONNSECMARK --save")
+	print("post -A selinux_new_output -j RETURN")
 
 def parse_corenet(file_name):
 	packets = []
@@ -118,33 +118,33 @@ def parse_corenet(file_name):
 	return packets
 
 def print_netfilter_config(packets,mls,mcs):
-	print "pre *mangle"
-	print "pre :PREROUTING ACCEPT [0:0]"
-	print "pre :INPUT ACCEPT [0:0]"
-	print "pre :FORWARD ACCEPT [0:0]"
-	print "pre :OUTPUT ACCEPT [0:0]"
-	print "pre :POSTROUTING ACCEPT [0:0]"
-	print "pre :selinux_input - [0:0]"
-	print "pre :selinux_output - [0:0]"
-	print "pre :selinux_new_input - [0:0]"
-	print "pre :selinux_new_output - [0:0]"
-	print "pre -A INPUT -j selinux_input"
-	print "pre -A OUTPUT -j selinux_output"
-	print "pre -A selinux_input -m state --state NEW -j selinux_new_input"
-	print "pre -A selinux_input -m state --state RELATED,ESTABLISHED -j CONNSECMARK --restore"
-	print "pre -A selinux_output -m state --state NEW -j selinux_new_output"
-	print "pre -A selinux_output -m state --state RELATED,ESTABLISHED -j CONNSECMARK --restore"
+	print("pre *mangle")
+	print("pre :PREROUTING ACCEPT [0:0]")
+	print("pre :INPUT ACCEPT [0:0]")
+	print("pre :FORWARD ACCEPT [0:0]")
+	print("pre :OUTPUT ACCEPT [0:0]")
+	print("pre :POSTROUTING ACCEPT [0:0]")
+	print("pre :selinux_input - [0:0]")
+	print("pre :selinux_output - [0:0]")
+	print("pre :selinux_new_input - [0:0]")
+	print("pre :selinux_new_output - [0:0]")
+	print("pre -A INPUT -j selinux_input")
+	print("pre -A OUTPUT -j selinux_output")
+	print("pre -A selinux_input -m state --state NEW -j selinux_new_input")
+	print("pre -A selinux_input -m state --state RELATED,ESTABLISHED -j CONNSECMARK --restore")
+	print("pre -A selinux_output -m state --state NEW -j selinux_new_output")
+	print("pre -A selinux_output -m state --state RELATED,ESTABLISHED -j CONNSECMARK --restore")
 	print_input_rules(packets,mls,mcs)
 	print_output_rules(packets,mls,mcs)
-	print "post COMMIT"
+	print("post COMMIT")
 
 mls = False
 mcs = False
 
 try:
 	opts, paths = getopt.getopt(sys.argv[1:],'mc',['mls','mcs'])
-except getopt.GetoptError, error:
-	print "Invalid options."
+except getopt.GetoptError as error:
+	print("Invalid options.")
 	sys.exit(1)
 
 for o, a in opts:

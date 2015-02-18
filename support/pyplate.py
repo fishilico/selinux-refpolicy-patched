@@ -182,7 +182,7 @@ class ForTemplateNode(TemplateNode):
       self.vars = []
       for v in self.vars_temp:
         self.vars.append(v.strip())
-      #print self.vars
+      #print(self.vars)
       self.expression = match.group(2)
 
   def execute(self, stream, data):
@@ -258,7 +258,7 @@ class FunctionTemplateNode(TemplateNode):
     self.vars = []
     for v in self.vars_temp:
       self.vars.append(v.strip())
-    #print self.vars
+    #print(self.vars)
     self.parent.functions[self.function_name] = self
 
   def execute(self, stream, data):
