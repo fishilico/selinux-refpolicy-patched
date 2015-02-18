@@ -12,8 +12,8 @@ init_daemon_domain(laptopmode_t, laptopmode_exec_t)
 type laptopmode_lock_t;
 files_lock_file(laptopmode_lock_t)
 
-type laptopmode_unit_file_t;
-systemd_unit_file(laptopmode_unit_file_t)
+#type laptopmode_unit_file_t;
+#systemd_unit_file(laptopmode_unit_file_t)
 
 type laptopmode_var_run_t;
 files_pid_file(laptopmode_var_run_t)

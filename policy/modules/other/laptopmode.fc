@@ -2,6 +2,6 @@
 
 /usr/bin/laptop_mode		--	gen_context(system_u:object_r:laptopmode_exec_t,s0)
 
-/usr/lib/systemd/system/laptop-mode\.service	--	gen_context(system_u:object_r:laptopmode_unit_file_t,s0)
+#/usr/lib/systemd/system/laptop-mode\.service	--	gen_context(system_u:object_r:laptopmode_unit_file_t,s0)
 /var/lock/lmt-.*\.lock	--	gen_context(system_u:object_r:laptopmode_lock_t,s0)
 /var/run/laptop-mode-tools(/.*)?	--		gen_context(system_u:object_r:laptopmode_var_run_t,s0)

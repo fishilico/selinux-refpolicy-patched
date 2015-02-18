@@ -51,8 +51,6 @@ files_pid_filetrans(psd_t, psd_var_run_t, file)
 # Silent pgrep!
 dontaudit psd_t domain:dir getattr;
 
-mozilla_manage_user_home_files(psd_t)
-
 auth_use_nsswitch(psd_t)
 dev_read_cpu_online(psd_t)
 

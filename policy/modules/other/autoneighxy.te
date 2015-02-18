@@ -58,7 +58,3 @@ kernel_read_network_state(autoneighxy_t)
 kernel_rw_net_sysctls(autoneighxy_t)
 allow autoneighxy_t self:packet_socket create_socket_perms;
 allow autoneighxy_t self:netlink_route_socket rw_netlink_socket_perms;
-
-optional_policy(`
-	pythonsupport_compiled_read(autoneighxy_t)
-')
