@@ -182,6 +182,12 @@ ifeq "$(TYPE)" "mcs"
 endif
 
 # enable distribution-specific policy
+ifeq "$(DISTRO_DETECT)" "y"
+	ifeq "$(DISTRO)" ""
+		DISTRO := $(shell $(SHELL) $(support)/detect_distro.sh)
+	endif
+endif
+
 ifneq ($(DISTRO),)
 	M4PARAM += -D distro_$(DISTRO)
 endif
