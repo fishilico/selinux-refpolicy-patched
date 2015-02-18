@@ -463,6 +463,9 @@ mls_file_write_all_levels(syslogd_t) # Need to be able to write to /var/run/ and
 term_write_console(syslogd_t)
 # Allow syslog to a terminal
 term_write_unallocated_ttys(syslogd_t)
+# syslog-ng with "destination console_all { file("/dev/tty12"); };" wants to chown root /dev/tty12.
+# Deny this access
+term_dontaudit_setattr_unallocated_ttys(syslogd_t)
 
 # for sending messages to logged in users
 init_read_utmp(syslogd_t)
@@ -480,13 +483,6 @@ miscfiles_read_localization(syslogd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(syslogd_t)
 userdom_dontaudit_search_user_home_dirs(syslogd_t)
-
-ifdef(`distro_gentoo',`
-	# default gentoo syslog-ng config appends kernel
-	# and high priority messages to /dev/tty12
-	# and chown/chgrp/chmod /dev/tty12, which is denied
-	term_dontaudit_setattr_unallocated_ttys(syslogd_t)
-')
 
 ifdef(`distro_suse',`
 	# suse creates a /dev/log under /var/lib/stunnel for chrooted stunnel
