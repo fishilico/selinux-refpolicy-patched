@@ -34,32 +34,6 @@ interface(`mls_file_read_to_clearance',`
 ########################################
 ## <summary>
 ##	Make specified domain MLS trusted
-##	for reading from files at all levels.  (Deprecated)
-## </summary>
-## <desc>
-##	<p>
-##	Make specified domain MLS trusted
-##	for reading from files at all levels.
-##	</p>
-##	<p>
-##	This interface has been deprecated, please use
-##	mls_file_read_all_levels() instead.
-##	</p>
-## </desc>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`mls_file_read_up',`
-	refpolicywarn(`$0($*) has been deprecated, please use mls_file_read_all_levels() instead.')
-	mls_file_read_all_levels($1)
-')
-
-########################################
-## <summary>
-##	Make specified domain MLS trusted
 ##	for reading from files at all levels.
 ## </summary>
 ## <param name="domain">
@@ -95,32 +69,6 @@ interface(`mls_file_write_to_clearance',`
 	')
 
 	typeattribute $1 mlsfilewritetoclr;
-')
-
-########################################
-## <summary>
-##	Make specified domain MLS trusted
-##	for writing to files at all levels.  (Deprecated)
-## </summary>
-## <desc>
-##	<p>
-##	Make specified domain MLS trusted
-##	for writing to files at all levels.
-##	</p>
-##	<p>
-##	This interface has been deprecated, please use
-##	mls_file_write_all_levels() instead.
-##	</p>
-## </desc>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`mls_file_write_down',`
-	refpolicywarn(`$0($*) has been deprecated, please use mls_file_write_all_levels() instead.')
-	mls_file_write_all_levels($1)
 ')
 
 ########################################
@@ -520,32 +468,6 @@ interface(`mls_process_read_to_clearance',`
 ########################################
 ## <summary>
 ##	Make specified domain MLS trusted
-##	for reading from processes at all levels.  (Deprecated)
-## </summary>
-## <desc>
-##	<p>
-##	Make specified domain MLS trusted
-##	for reading from processes at all levels.
-##	</p>
-##	<p>
-##	This interface has been deprecated, please use
-##	mls_process_read_all_levels() instead.
-##	</p>
-## </desc>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`mls_process_read_up',`
-#	refpolicywarn(`$0($*) has been deprecated, please use mls_process_read_all_levels() instead.')
-	mls_process_read_all_levels($1)
-')
-
-########################################
-## <summary>
-##	Make specified domain MLS trusted
 ##	for reading from processes at all levels.
 ## </summary>
 ## <param name="domain">
@@ -582,32 +504,6 @@ interface(`mls_process_write_to_clearance',`
 	')
 
 	typeattribute $1 mlsprocwritetoclr;
-')
-
-########################################
-## <summary>
-##	Make specified domain MLS trusted
-##	for writing to processes at all levels.  (Deprecated)
-## </summary>
-## <desc>
-##	<p>
-##	Make specified domain MLS trusted
-##	for writing to processes at all levels.
-##	</p>
-##	<p>
-##	This interface has been deprecated, please use
-##	mls_process_write_all_levels() instead.
-##	</p>
-## </desc>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`mls_process_write_down',`
-#	refpolicywarn(`$0($*) has been deprecated, please use mls_process_write_all_levels() instead.')
-	mls_process_write_all_levels($1)
 ')
 
 ########################################
