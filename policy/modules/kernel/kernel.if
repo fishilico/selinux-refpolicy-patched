@@ -293,7 +293,7 @@ interface(`kernel_stream_connect',`
 
 ########################################
 ## <summary>
-##	Read and write kernel unix datagram sockets.
+##	Read and write kernel unix datagram sockets. (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -302,6 +302,25 @@ interface(`kernel_stream_connect',`
 ## </param>
 #
 interface(`kernel_rw_unix_dgram_sockets',`
+	gen_require(`
+		type kernel_t;
+	')
+
+	refpolicywarn(`$0($1) has been deprecated, please use kernel_rw_dgram_sockets() instead')
+	kernel_rw_dgram_sockets($1)
+')
+
+########################################
+## <summary>
+##	Read and write kernel unix datagram sockets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_rw_dgram_sockets',`
 	gen_require(`
 		type kernel_t;
 	')

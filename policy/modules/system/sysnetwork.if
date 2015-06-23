@@ -86,7 +86,7 @@ interface(`sysnet_dontaudit_use_dhcpc_fds',`
 ########################################
 ## <summary>
 ##	Do not audit attempts to read/write to the
-##	dhcp unix stream socket descriptors.
+##	dhcp unix stream socket descriptors. (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -95,6 +95,26 @@ interface(`sysnet_dontaudit_use_dhcpc_fds',`
 ## </param>
 #
 interface(`sysnet_dontaudit_rw_dhcpc_unix_stream_sockets',`
+	gen_require(`
+		type dhcpc_t;
+	')
+
+	refpolicywarn(`$0($1) has been deprecated, please use sysnet_dontaudit_rw_dhcpc_stream_sockets() instead.')
+	sysnet_dontaudit_rw_dhcpc_stream_sockets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to read/write to the
+##	dhcp unix stream socket descriptors.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`sysnet_dontaudit_rw_dhcpc_stream_sockets',`
 	gen_require(`
 		type dhcpc_t;
 	')

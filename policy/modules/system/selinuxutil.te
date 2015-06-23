@@ -540,7 +540,7 @@ kernel_relabelfrom_unlabeled_pipes(setfiles_t)
 kernel_relabelfrom_unlabeled_sockets(setfiles_t)
 kernel_use_fds(setfiles_t)
 kernel_rw_pipes(setfiles_t)
-kernel_rw_unix_dgram_sockets(setfiles_t)
+kernel_rw_dgram_sockets(setfiles_t)
 kernel_dontaudit_list_all_proc(setfiles_t)
 kernel_dontaudit_list_all_sysctls(setfiles_t)
 
