@@ -206,7 +206,7 @@ interface(`xen_read_xenstored_pid_files',`
 ##	</summary>
 ## </param>
 #
-interface(`xen_dontaudit_rw_unix_stream_sockets',`
+interface(`xen_dontaudit_rw_stream_sockets',`
 	gen_require(`
 		type xend_t;
 	')

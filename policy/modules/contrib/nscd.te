@@ -135,6 +135,6 @@ optional_policy(`
 ')
 
 optional_policy(`
-	xen_dontaudit_rw_unix_stream_sockets(nscd_t)
+	xen_dontaudit_rw_stream_sockets(nscd_t)
 	xen_append_log(nscd_t)
 ')
