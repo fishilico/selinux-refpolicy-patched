@@ -4088,6 +4088,27 @@ interface(`dev_rw_sysfs',`
 
 ########################################
 ## <summary>
+##	Relabel from/to all sysfs types.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_relabel_all_sysfs',`
+	gen_require(`
+		attribute sysfs_types;
+	')
+
+	relabel_dirs_pattern($1, sysfs_types, sysfs_types)
+	relabel_files_pattern($1, sysfs_types, sysfs_types)
+	relabel_lnk_files_pattern($1, sysfs_types, sysfs_types)
+	list_dirs_pattern($1, sysfs_types, sysfs_types)
+')
+
+########################################
+## <summary>
 ##	Read and write the TPM device.
 ## </summary>
 ## <param name="domain">

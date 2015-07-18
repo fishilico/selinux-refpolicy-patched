@@ -108,6 +108,10 @@ interface(`init_domain',`
 	role system_r types $1;
 
 	domtrans_pattern(init_t, $2, $1)
+
+	ifdef(`init_systemd',`
+		allow $1 init_t:unix_stream_socket { read write ioctl };
+	')
 ')
 
 ########################################
@@ -192,28 +196,32 @@ interface(`init_daemon_domain',`
 
 	typeattribute $1 daemon;
 
-	domain_type($1)
-	domain_entry_file($1, $2)
+	ifdef(`init_systemd',`
+		init_domain($1, $2)
+	',`
+		domain_type($1)
+		domain_entry_file($1, $2)
 
-	role system_r types $1;
+		role system_r types $1;
 
-	domtrans_pattern(initrc_t, $2, $1)
+		domtrans_pattern(initrc_t, $2, $1)
 
-	# daemons started from init will
-	# inherit fds from init for the console
-	init_dontaudit_use_fds($1)
-	term_dontaudit_use_console($1)
+		# daemons started from init will
+		# inherit fds from init for the console
+		init_dontaudit_use_fds($1)
+		term_dontaudit_use_console($1)
 
-	# init script ptys are the stdin/out/err
-	# when using run_init
-	init_use_script_ptys($1)
+		# init script ptys are the stdin/out/err
+		# when using run_init
+		init_use_script_ptys($1)
 
-	ifdef(`direct_sysadm_daemon',`
-		userdom_dontaudit_use_user_terminals($1)
-	')
+		ifdef(`direct_sysadm_daemon',`
+			userdom_dontaudit_use_user_terminals($1)
+		')
 
-	optional_policy(`
-		nscd_use($1)
+		optional_policy(`
+			nscd_use($1)
+		')
 	')
 ')
 
@@ -264,15 +272,67 @@ interface(`init_ranged_daemon_domain',`
 		type initrc_t;
 	')
 
-	init_daemon_domain($1, $2)
+	ifdef(`init_systemd',`
+		init_ranged_domain($1, $2, $3)
+	',`
+		init_daemon_domain($1, $2)
 
-	ifdef(`enable_mcs',`
-		range_transition initrc_t $2:process $3;
+		ifdef(`enable_mcs',`
+			range_transition initrc_t $2:process $3;
+		')
+
+		ifdef(`enable_mls',`
+			range_transition initrc_t $2:process $3;
+			mls_rangetrans_target($1)
+		')
 	')
+')
 
-	ifdef(`enable_mls',`
-		range_transition initrc_t $2:process $3;
-		mls_rangetrans_target($1)
+#########################################
+## <summary>
+##	Abstract socket service activation (systemd).
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The domain to be started by systemd socket activation.
+##	</summary>
+## </param>
+#
+interface(`init_abstract_socket_activation',`
+	ifdef(`init_systemd',`
+		gen_require(`
+			type init_t;
+		')
+
+		allow init_t $1:unix_stream_socket { bind create setopt listen };
+	')
+')
+
+#########################################
+## <summary>
+##	Named socket service activation (systemd).
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The domain to be started by systemd socket activation.
+##	</summary>
+## </param>
+## <param name="sock_file">
+##	<summary>
+##	The domain socket file type.
+##	</summary>
+## </param>
+#
+interface(`init_named_socket_activation',`
+	ifdef(`init_systemd',`
+		gen_require(`
+			type init_t;
+		')
+
+		allow init_t $1:unix_stream_socket { bind create setopt listen };
+
+		allow init_t $2:dir create;
+		create_sock_files_pattern(init_t, $2, $2)
 	')
 ')
 
@@ -323,7 +383,11 @@ interface(`init_system_domain',`
 
 	role system_r types $1;
 
-	domtrans_pattern(initrc_t, $2, $1)
+	ifdef(`init_systemd',`
+		init_domain($1, $2)
+	',`
+		domtrans_pattern(initrc_t, $2, $1)
+	')	
 ')
 
 ########################################
@@ -374,15 +438,19 @@ interface(`init_ranged_system_domain',`
 		type initrc_t;
 	')
 
-	init_system_domain($1, $2)
+	ifdef(`init_systemd',`
+		init_ranged_domain($1, $2, $3)
+	',`
+		init_system_domain($1, $2)
 
-	ifdef(`enable_mcs',`
-		range_transition initrc_t $2:process $3;
-	')
+		ifdef(`enable_mcs',`
+			range_transition initrc_t $2:process $3;
+		')
 
-	ifdef(`enable_mls',`
-		range_transition initrc_t $2:process $3;
-		mls_rangetrans_target($1)
+		ifdef(`enable_mls',`
+			range_transition initrc_t $2:process $3;
+			mls_rangetrans_target($1)
+		')
 	')
 ')
 
@@ -1705,6 +1773,72 @@ interface(`init_script_tmp_filetrans',`
 
 	files_search_tmp($1)
 	filetrans_pattern($1, initrc_tmp_t, $2, $3, $4)
+')
+
+########################################
+## <summary>
+##	Create files in an init lib directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="file_type">
+##	<summary>
+##	The type of the object to be created
+##	</summary>
+## </param>
+## <param name="object_class">
+##	<summary>
+##	The object class.
+##	</summary>
+## </param>
+## <param name="name" optional="true">
+##	<summary>
+##	The name of the object being created.
+##	</summary>
+## </param>
+#
+interface(`init_var_lib_filetrans',`
+	gen_require(`
+		type init_var_lib_t;
+	')
+	files_search_var_lib($1)
+	filetrans_pattern($1, init_var_lib_t, $2, $3, $4)
+')
+
+########################################
+## <summary>
+##	Create files in an init PID directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="file_type">
+##	<summary>
+##	The type of the object to be created
+##	</summary>
+## </param>
+## <param name="object_class">
+##	<summary>
+##	The object class.
+##	</summary>
+## </param>
+## <param name="name" optional="true">
+##	<summary>
+##	The name of the object being created.
+##	</summary>
+## </param>
+#
+interface(`init_pid_filetrans',`
+	gen_require(`
+		type init_var_run_t;
+	')
+	files_search_pids($1)
+	filetrans_pattern($1, init_var_run_t, $2, $3, $4)
 ')
 
 ########################################

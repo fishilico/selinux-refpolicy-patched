@@ -182,6 +182,58 @@ seutil_read_config(init_t)
 
 miscfiles_read_localization(init_t)
 
+ifdef(`init_systemd',`
+	# handle instances where an old labeled init script is encountered.
+	typeattribute init_t init_run_all_scripts_domain;
+
+	allow init_t self:process { getcap getsched setpgid setfscreate setsockcreate setcap setrlimit };
+	allow init_t self:capability2 block_suspend;
+	allow init_t self:netlink_audit_socket nlmsg_readpriv;
+	allow init_t self:netlink_kobject_uevent_socket read;
+	allow init_t self:netlink_selinux_socket read;
+
+	allow init_t init_var_run_t:dir manage_dir_perms;
+
+	kernel_read_kernel_sysctls(init_t)
+	kernel_read_vm_sysctls(init_t)
+
+	domain_read_all_domains_state(init_t)
+
+	files_mounton_root(init_t)
+	# for privatetmp functions
+	files_manage_generic_tmp_dirs(init_t)
+	files_mounton_tmp(init_t)
+
+	fs_manage_cgroup_dirs(init_t)
+	fs_rw_cgroup_files(init_t)
+
+	selinux_compute_create_context(init_t)
+	selinux_compute_access_vector(init_t)
+
+	logging_send_audit_msgs(init_t)
+
+	optional_policy(`
+		modutils_domtrans_insmod(init_t)
+	')
+
+	optional_policy(`
+		dbus_system_bus_client(init_t)
+		dbus_connect_system_bus(init_t)
+	')
+
+	optional_policy(`
+		plymouthd_stream_connect(init_t)
+	')
+',`
+	tunable_policy(`init_upstart',`
+		corecmd_shell_domtrans(init_t, initrc_t)
+	',`
+		# Run the shell in the sysadm role for single-user mode.
+		# causes problems with upstart
+		sysadm_shell_domtrans(init_t)
+	')
+')
+
 ifdef(`distro_debian',`
 	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file, "initctl")
 
@@ -199,14 +251,6 @@ ifdef(`distro_redhat',`
 	fs_read_tmpfs_symlinks(init_t)
 	fs_rw_tmpfs_chr_files(init_t)
 	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file)
-')
-
-tunable_policy(`init_upstart',`
-	corecmd_shell_domtrans(init_t, initrc_t)
-',`
-	# Run the shell in the sysadm role for single-user mode.
-	# causes problems with upstart
-	sysadm_shell_domtrans(init_t)
 ')
 
 optional_policy(`
@@ -607,6 +651,16 @@ ifdef(`distro_suse',`
 		# set permissions on /tmp/.X11-unix
 		xserver_setattr_xdm_tmp_dirs(initrc_t)
 	')
+')
+
+ifdef(`init_systemd',`
+	# run systemd misc initializations
+	# in the initrc_t domain, as would be
+	# done in traditional sysvinit/upstart.
+	corecmd_bin_entry_type(initrc_t)
+	corecmd_shell_entry_type(initrc_t)
+	corecmd_bin_domtrans(init_t, initrc_t)
+	corecmd_shell_domtrans(init_t, initrc_t)
 ')
 
 optional_policy(`
