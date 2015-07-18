@@ -12,13 +12,21 @@ dbus_system_domain(devicekit_t, devicekit_exec_t)
 type devicekit_power_t;
 type devicekit_power_exec_t;
 dbus_system_domain(devicekit_power_t, devicekit_power_exec_t)
+init_daemon_domain(devicekit_power_t, devicekit_power_exec_t)
 
 type devicekit_disk_t;
 type devicekit_disk_exec_t;
 dbus_system_domain(devicekit_disk_t, devicekit_disk_exec_t)
+init_daemon_domain(devicekit_disk_t, devicekit_disk_exec_t)
 
 type devicekit_tmp_t;
 files_tmp_file(devicekit_tmp_t)
+
+type devicekit_disk_unit_t;
+init_unit_file(devicekit_disk_unit_t)
+
+type devicekit_power_unit_t;
+init_unit_file(devicekit_power_unit_t)
 
 type devicekit_var_run_t;
 files_pid_file(devicekit_var_run_t)
