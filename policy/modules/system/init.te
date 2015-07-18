@@ -94,6 +94,10 @@ files_pid_file(initrc_var_run_t)
 type systemd_unit_t;
 init_unit_file(systemd_unit_t)
 
+# /run/systemd/notify
+type init_notify_var_run_t;
+files_type(init_notify_var_run_t)
+
 ifdef(`distro_gentoo',`
 	type rc_exec_t;
 	domain_entry_file(initrc_t, rc_exec_t)
@@ -244,6 +248,9 @@ ifdef(`init_systemd',`
 	# for privatetmp functions
 	files_manage_generic_tmp_dirs(init_t)
 	files_mounton_tmp(init_t)
+
+	# for /run/systemd/notify
+	filetrans_pattern(init_t, init_var_run_t, init_notify_var_run_t, sock_file, "notify")
 
 	fs_manage_cgroup_dirs(init_t)
 	fs_relabel_cgroup_dirs(init_t)

@@ -130,7 +130,12 @@ interface(`init_domain',`
 	domtrans_pattern(init_t, $2, $1)
 
 	ifdef(`init_systemd',`
+		gen_require(`
+			type init_var_run_t, init_notify_var_run_t;
+		')
 		allow $1 init_t:unix_stream_socket { getattr read write ioctl };
+		# /run/systemd/notify
+		dgram_send_pattern($1, init_var_run_t, init_notify_var_run_t, init_t)
 	')
 ')
 
