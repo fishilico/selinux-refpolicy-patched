@@ -504,6 +504,8 @@ ifdef(`init_systemd',`
 	kernel_rw_unix_dgram_sockets(syslogd_t)
 	kernel_rw_stream_sockets(syslogd_t)
 
+	logging_set_audit_parameters(syslogd_t)
+
 	init_daemon_pid_file(syslogd_var_run_t, dir, "syslogd")
 	init_dgram_send(syslogd_t)
 
