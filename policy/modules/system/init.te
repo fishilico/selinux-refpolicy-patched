@@ -271,6 +271,45 @@ ifdef(`init_systemd',`
 	# for network namespaces
 	fs_read_nsfs_files(init_t)
 
+	# (Testing/WIP) systemd container for PrivateDevices/PrivateTmp/...
+	# Manage everything under "/tmp/namespace-dev-XXXXXX/dev", which is a tmpfs
+	fs_mount_tmpfs(init_t)
+	fs_manage_tmpfs_dirs(init_t)
+	# Bind-mount /dev/pts, /dev/shm... to /tmp/namespace-dev-XXXXXX/dev
+	fs_mounton_tmpfs(init_t)
+	# Create symlinux in /tmp/namespace-dev-XXXXXX/dev
+	fs_manage_tmpfs_symlinks(init_t)
+	# /dev/null, /dev/zero are created directly with their good labels
+	dev_create_null_dev(init_t)
+	dev_create_rand(init_t)
+	dev_create_urand(init_t)
+	dev_create_zero_dev(init_t)
+	term_create_controlling_term(init_t)
+	# Mount the tmpfs dev over /dev
+	dev_mounton(init_t)
+
+	# TODO: merge with rules which exist in refpolicy
+	# systemd likes to remount/unmount things when setting up containers
+	fs_getattr_all_fs(init_t)
+	fs_remount_all_fs(init_t)
+	fs_unmount_all_fs(init_t)
+
+	# TODO: add interfaces to mount over /home, /root, /run/user and /usr
+	optional_policy(`
+		gen_require(`
+			type home_root_t;
+			type var_auth_t;
+			type user_home_dir_t;
+			type usr_t;
+		')
+		allow init_t home_root_t:dir mounton;
+		allow init_t user_home_dir_t:dir mounton;
+		allow init_t var_auth_t:dir mounton;
+		allow init_t usr_t:dir mounton;
+	')
+
+
+
 	# systemd_socket_activated policy
 	mls_socket_write_all_levels(init_t)
 

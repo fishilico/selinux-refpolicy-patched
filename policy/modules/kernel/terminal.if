@@ -696,6 +696,27 @@ interface(`term_use_controlling_term',`
 	allow $1 devtty_t:chr_file { rw_term_perms lock append };
 ')
 
+########################################
+## <summary>
+##	Create the controlling
+##	terminal (/dev/tty).
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`term_create_controlling_term',`
+	gen_require(`
+		type devtty_t;
+	')
+
+	dev_add_entry_generic_dirs($1)
+	allow $1 self:capability mknod;
+	allow $1 devtty_t:chr_file create_chr_file_perms;
+')
+
 #######################################
 ## <summary>
 ##	Get the attributes of the pty multiplexor (/dev/ptmx).
