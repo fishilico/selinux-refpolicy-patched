@@ -172,6 +172,27 @@ interface(`systemd_signull_logind',`
 	allow $1 systemd_logind_t:process signull;
 ')
 
+######################################
+## <summary>
+##	Read systemd-networkd /var/run/systemd/netif
+##	files and directories
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`systemd_read_networkd_run',`
+	gen_require(`
+		type systemd_networkd_var_run_t;
+	')
+
+	init_search_run($1)
+	allow $1 systemd_networkd_var_run_t:dir list_dir_perms;
+	read_files_pattern($1, systemd_networkd_var_run_t, systemd_networkd_var_run_t)
+')
+
 ########################################
 ## <summary>
 ## Allow specified domain to start power units
