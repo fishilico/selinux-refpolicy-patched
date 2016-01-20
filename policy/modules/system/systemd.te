@@ -322,8 +322,7 @@ udev_read_pid_files(systemd_logind_t)
 userdom_use_user_ttys(systemd_logind_t)
 
 optional_policy(`
-	dbus_system_bus_client(systemd_logind_t)
-	dbus_connect_system_bus(systemd_logind_t)
+	dbus_system_domain(systemd_logind_t, systemd_logind_exec_t)
 ')
 
 #######################################
