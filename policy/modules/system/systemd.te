@@ -74,6 +74,9 @@ type systemd_logind_exec_t;
 init_daemon_domain(systemd_logind_t, systemd_logind_exec_t)
 init_named_socket_activation(systemd_logind_t, systemd_logind_var_run_t)
 
+type systemd_logind_unit_t;
+init_unit_file(systemd_logind_unit_t)
+
 type systemd_logind_var_lib_t;
 files_type(systemd_logind_var_lib_t)
 
