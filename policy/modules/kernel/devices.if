@@ -4707,9 +4707,45 @@ interface(`dev_relabelfrom_vfio_dev',`
 	relabelfrom_chr_files_pattern($1, device_t, vfio_device_t)
 ')
 
+########################################
+## <summary>
+##	Get the attributes of the vhost net device.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_getattr_vhost',`
+	gen_require(`
+		type device_t, vhost_device_t;
+	')
+
+	getattr_chr_files_pattern($1, device_t, vhost_device_t)
+')
+
+########################################
+## <summary>
+##	Set the attributes of the vhost net device.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_setattr_vhost',`
+	gen_require(`
+		type device_t, vhost_device_t;
+	')
+
+	setattr_chr_files_pattern($1, device_t, vhost_device_t)
+')
+
 ############################
 ## <summary>
-##	Allow read/write the vhost net device
+##	Allow read/write the vhost net device.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -4797,6 +4833,43 @@ interface(`dev_write_watchdog',`
 
 	write_chr_files_pattern($1, device_t, watchdog_device_t)
 ')
+
+########################################
+## <summary>
+##      Get the attributes of the wireless device.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`dev_getattr_wireless',`
+	gen_require(`
+		type device_t, wireless_device_t;
+	')
+
+	getattr_chr_files_pattern($1, device_t, wireless_device_t)
+')
+
+########################################
+## <summary>
+##      Set the attributes of the wireless device.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`dev_setattr_wireless',`
+	gen_require(`
+		type device_t, wireless_device_t;
+	')
+
+	setattr_chr_files_pattern($1, device_t, wireless_device_t)
+')
+
 
 ########################################
 ## <summary>
