@@ -140,6 +140,13 @@ type systemd_sessions_var_run_t;
 files_pid_file(systemd_sessions_var_run_t)
 init_daemon_pid_file(systemd_sessions_var_run_t, dir, "systemd_sessions")
 
+type systemd_sysctl_t;
+type systemd_sysctl_exec_t;
+init_system_domain(systemd_sysctl_t, systemd_sysctl_exec_t)
+
+type systemd_sysctl_unit_t;
+init_unit_file(systemd_sysctl_unit_t)
+
 type systemd_timedated_t;
 type systemd_timedated_exec_t;
 init_system_domain(systemd_timedated_t, systemd_timedated_exec_t)
@@ -409,6 +416,21 @@ allow systemd_sessions_t systemd_sessions_var_run_t:file manage_file_perms;
 files_pid_filetrans(systemd_sessions_t, systemd_sessions_var_run_t, file)
 
 systemd_log_parse_environment(systemd_sessions_t)
+
+#######################################
+#
+# Sysctl local policy
+#
+
+files_read_etc_files(systemd_sysctl_t)
+
+kernel_rw_all_sysctls(systemd_sysctl_t)
+
+# systemd use "net.core.default_qdisc = fq_codel" by default, which loads sch_fq_codel module
+# https://github.com/systemd/systemd/blob/v228/sysctl.d/50-default.conf#L36
+kernel_request_load_module(systemd_sysctl_t)
+
+systemd_log_parse_environment(systemd_sysctl_t)
 
 #######################################
 #
