@@ -44,6 +44,7 @@
 /usr/lib/systemd/system/systemd-timesyncd.*	--	gen_context(system_u:object_r:systemd_timesyncd_unit_t,s0)
 
 /var/lib/systemd/backlight(/.*)?	gen_context(system_u:object_r:systemd_backlight_var_lib_t,s0)
+/var/lib/systemd/coredump(/.*)?	gen_context(system_u:object_r:systemd_coredump_var_lib_t,s0)
 /var/lib/systemd/linger(/.*)?	gen_context(system_u:object_r:systemd_logind_var_lib_t,s0)
 /var/lib/systemd/rfkill(/.*)?	gen_context(system_u:object_r:systemd_rfkill_var_lib_t,s0)
 
