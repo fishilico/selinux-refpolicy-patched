@@ -276,7 +276,7 @@ optional_policy(`
 #
 
 allow systemd_logind_t self:capability { fowner sys_tty_config chown dac_override };
-allow systemd_logind_t self:process getcap;
+allow systemd_logind_t self:process { getcap setfscreate };
 allow systemd_logind_t self:netlink_kobject_uevent_socket create_socket_perms;
 allow systemd_logind_t self:unix_dgram_socket create_socket_perms;
 allow systemd_logind_t self:fifo_file rw_fifo_file_perms;
