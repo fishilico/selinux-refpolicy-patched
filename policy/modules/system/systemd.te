@@ -280,6 +280,9 @@ optional_policy(`
 # Hostnamed policy
 #
 
+# Read /sys/class/dmi/id/product_name
+dev_read_sysfs(systemd_hostnamed_t)
+
 kernel_read_kernel_sysctls(systemd_hostnamed_t)
 
 files_read_etc_files(systemd_hostnamed_t)
