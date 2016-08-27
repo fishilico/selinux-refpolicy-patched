@@ -29,6 +29,7 @@ dist: trusty
 addons:
   apt:
     packages:
+    - checkpolicy
     - policycoreutils
 
 
