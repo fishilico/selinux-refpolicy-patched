@@ -1,8 +1,6 @@
 # Derived from Nicolas Iooss: https://github.com/fishilico/selinux-refpolicy-patched/blob/travis-upstream/.travis.yml
 
-language: python
-python:
- - "2.7"
+language: generic
 
 env:
   - TYPE=standard DISTRO=redhat MONOLITHIC=y SYSTEMD=y
@@ -31,53 +29,19 @@ dist: trusty
 addons:
   apt:
     packages:
-    # Install SELinux userspace utilities dependencies
-    - bison
-    - flex
-    - gettext
-    - libaudit-dev
-    - libbz2-dev
-    - libustr-dev
-    - libpcre3-dev
-    - swig
+    - policycoreutils
 
-install:
+
+script:
   - lsb_release -a
-  - bison -V
-  - flex -V
 
-  # Download current SELinux userspace tools and libraries
-  - curl -sS -L https://github.com/SELinuxProject/selinux/archive/20160223.tar.gz | tar xz
-  - mv selinux-20160223 selinux-src
-
-  # Ubuntu 12.04 coreutils is too old to provide "ln --relative" :(
-  - sed 's/ln -sf --relative /ln -sf /' -i selinux-src/libsepol/src/Makefile
-  - sed 's/ln -sf --relative /ln -sf /' -i selinux-src/libselinux/src/Makefile
-
-  # Drop secilc to break xmlto dependence (secilc isn't used here anyway)
-  - sed -i -e 's/secilc//' selinux-src/Makefile
-
-  # Drop sepolicy to break setools dependence (sepolicy isn't used anyway)
-  - sed -i -e 's/sepolicy//' selinux-src/policycoreutils/Makefile
-
-  # Drop restorecond to break glib dependence
-  - sed -i -e 's/ restorecond//' selinux-src/policycoreutils/Makefile
-
-  # Drop sandbox to break libcap-ng dependence
-  - sed -i -e 's/ sandbox//' selinux-src/policycoreutils/Makefile
-
-  # Compile and install SELinux toolchain into ~/selinux
-  # On Ubuntu 12.04, default CFLAGS make the build fail in libsepol/cil with:
-  #    error: declaration of 'index' shadows a global declarationo
-  - make "DESTDIR=$HOME/selinux" CFLAGS="-O2 -pipe -fPIC -Wall -I$HOME/selinux/usr/include" -C selinux-src install
-
-  # Use TEST_TOOLCHAIN variable to tell refpolicy Makefile about the installed location
-  - export TEST_TOOLCHAIN="$HOME/selinux"
+  # Check the version of checkpolicy which is used
+  - checkpolicy -V
 
   # Drop build.conf settings to listen to env vars
   - sed -r -i -e '/(MONOLITHIC|TYPE|DISTRO|SYSTEMD)/d' build.conf
 
-script:
+  # Build!
   - echo $TYPE $DISTRO $MONOLITHIC
   - make bare
   - make conf
