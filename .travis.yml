@@ -24,8 +24,9 @@ env:
   - TYPE=mls DISTRO=gentoo MONOLITHIC=y SYSTEMD=n
   - TYPE=mls DISTRO=gentoo MONOLITHIC=n SYSTEMD=n
 
-# Use Travis-CI container infrastructure (https://docs.travis-ci.com/user/ci-environment/)
-sudo: false
+# Use Travis-CI Trusty environments (https://docs.travis-ci.com/user/trusty-ci-environment/)
+sudo: required
+dist: trusty
 
 addons:
   apt:
