@@ -125,6 +125,11 @@ UBAC			Boolean.  If set, the SELinux user will be used
 SYSTEMD			Boolean.  If set, systemd will be assumed to be the init
 			process provider.
 
+SINGLE_USR_BIN		Boolean.  If set, the system will be assumed to have a
+			single /usr/bin directory for files usually located in
+			/usr/bin and /usr/sbin.  The build system will replace
+			/usr/sbin with /usr/s?bin in every pattern.
+
 MLS_SENS		Integer.  Set the number of sensitivities in the MLS
 			policy.  Ignored on standard and MCS policies.
 

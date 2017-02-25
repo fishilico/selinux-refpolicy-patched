@@ -179,7 +179,7 @@ ifeq ($(all_fc_files),)
 endif
 	@echo "Creating $(NAME) file_contexts."
 	@test -d $(tmpdir) || mkdir -p $(tmpdir)
-	$(verbose) $(M4) $(M4PARAM) $^ > $@
+	$(verbose) $(M4) $(M4PARAM) $^ | $(sed_single_usr_bin) > $@
 
 $(homedir_template): $(fc)
 

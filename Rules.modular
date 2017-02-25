@@ -79,7 +79,7 @@ $(tmpdir)/%.mod: $(m4support) $(tmpdir)/generated_definitions.conf $(tmpdir)/all
 
 $(tmpdir)/%.mod.fc: $(m4support) %.fc
 	@test -d $(tmpdir) || mkdir -p $(tmpdir)
-	$(verbose) $(M4) $(M4PARAM) $(m4support) $^ > $@
+	$(verbose) $(M4) $(M4PARAM) $(m4support) $^ | $(sed_single_usr_bin) > $@
 
 $(builddir)%.pp: $(tmpdir)/%.mod $(tmpdir)/%.mod.fc
 	@echo "Creating $(NAME) $(@F) policy package"
@@ -187,7 +187,7 @@ ifeq ($(base_fc_files),)
 endif
 	@echo "Creating $(NAME) base module file contexts."
 	@test -d $(tmpdir) || mkdir -p $(tmpdir)
-	$(verbose) $(M4) $(M4PARAM) $^ > $@
+	$(verbose) $(M4) $(M4PARAM) $^ | $(sed_single_usr_bin) > $@
 
 ########################################
 #

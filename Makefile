@@ -110,6 +110,12 @@ m4terminate := $(support)/fatal_error.m4
 # use our own genhomedircon to make sure we have a known usable one,
 # so policycoreutils updates are not required (RHEL4)
 genhomedircon := $(PYTHON) -E $(support)/genhomedircon
+# Replace /usr/sbin with /usr/s?bin in file contexts
+ifeq ($(SINGLE_USR_BIN),y)
+sed_single_usr_bin = $(SED) 's:^/usr/sbin:/usr/s?bin:'
+else
+sed_single_usr_bin = cat
+endif
 
 # documentation paths
 docs := doc
