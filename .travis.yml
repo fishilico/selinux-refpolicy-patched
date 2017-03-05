@@ -6,12 +6,16 @@ matrix:
   fast_finish: true
 
 env:
+  - TYPE=standard DISTRO=arch MONOLITHIC=y SYSTEMD=y WERROR=y SINGLE_USR_BIN=y
+  - TYPE=standard DISTRO=arch MONOLITHIC=n SYSTEMD=y WERROR=y SINGLE_USR_BIN=y
   - TYPE=standard DISTRO=redhat MONOLITHIC=y SYSTEMD=y WERROR=y
   - TYPE=standard DISTRO=redhat MONOLITHIC=n SYSTEMD=y WERROR=y
   - TYPE=standard DISTRO=debian MONOLITHIC=y SYSTEMD=y WERROR=y
   - TYPE=standard DISTRO=debian MONOLITHIC=n SYSTEMD=y WERROR=y
   - TYPE=standard DISTRO=gentoo MONOLITHIC=y SYSTEMD=n WERROR=y
   - TYPE=standard DISTRO=gentoo MONOLITHIC=n SYSTEMD=n WERROR=y
+  - TYPE=mcs DISTRO=arch MONOLITHIC=y SYSTEMD=y WERROR=y SINGLE_USR_BIN=y
+  - TYPE=mcs DISTRO=arch MONOLITHIC=n SYSTEMD=y WERROR=y SINGLE_USR_BIN=y
   - TYPE=mcs DISTRO=redhat MONOLITHIC=y SYSTEMD=y WERROR=y
   - TYPE=mcs DISTRO=redhat MONOLITHIC=n SYSTEMD=y WERROR=y
   - TYPE=mcs DISTRO=debian MONOLITHIC=y SYSTEMD=y WERROR=y
@@ -102,3 +106,7 @@ script:
   - make conf
   - make
   - make validate
+  - if [ "$MONOLITHIC" = n ] ; then grep '^/usr/[^/]*bin/' tmp/all_mods.fc ; fi
+
+notifications:
+  email: false
